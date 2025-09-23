@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Visor de PDF con Menú Interactivo</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
@@ -13,23 +13,26 @@
       margin: 20px;
       height: 100vh;
       align-items: flex-start;
+      position: relative;
     }
 
     #container {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       width: 100%;
       max-width: 1200px;
       position: relative;
     }
 
+    /* Linkes Menü */
     #menu {
       width: 250px;
       background-color: #f1f1f1;
       padding: 10px;
       border: 1px solid #ccc;
-      height: 100%;
+      height: auto;
       text-align: center;
+      box-sizing: border-box;
     }
 
     #pdf-container {
@@ -38,7 +41,7 @@
       justify-content: center;
       align-items: center;
       position: relative;
-      margin-left: 20px;
+      margin: 0 20px;
     }
 
     canvas {
@@ -47,54 +50,70 @@
       height: auto;
     }
 
-    /* Neues Navigationsmenü rechts neben PDF, oben, links bündig ohne Lücke */
+    /* Rechtes Menü */
     #right-navigation {
-      position: absolute;
-      top: 0;
-      left: 100%; /* direkt rechts neben #pdf-container */
-      margin-left: 0;
       width: 250px;
       background-color: #f1f1f1;
       padding: 10px;
       border: 1px solid #ccc;
+      height: auto;
       text-align: center;
+      font-family: Arial, sans-serif;
+
+      position: absolute;
+      top: 0;
+      /* Position: rechts neben #pdf-container */
+      left: calc(50% + 290px); /* 50% Container + 250px linkes Menü + 20px Margin links + 20px Margin rechts */
       box-sizing: border-box;
     }
 
-    button, input[type=number] {
+    /* Gemeinsames Styling für Überschriften */
+    #menu h3,
+    #menu h4,
+    #right-navigation h3,
+    #right-navigation h4 {
+      margin-bottom: 15px;
+      font-weight: bold;
       font-size: 16px;
-      margin: 5px 0;
-      padding: 5px 10px;
-      width: 100%;
-      box-sizing: border-box;
+      color: #000;
     }
 
+    /* Buttons Styling */
     .menu-button {
-      display: inline-block;
+      display: block;
+      width: 100%;
       margin: 5px 0;
       padding: 8px;
       background-color: #008CBA;
       color: white;
-      text-align: center;
+      font-size: 16px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      width: 100%;
+      box-sizing: border-box;
+      text-align: center;
     }
 
     .menu-button:hover {
       background-color: #007B9A;
     }
 
-    #menu h3, #right-navigation h3 {
-      text-align: center;
-      margin-bottom: 15px;
+    /* Input Styling */
+    input[type=number] {
+      width: 100%;
+      padding: 6px 8px;
+      margin: 8px 0 15px 0;
+      font-size: 14px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
     }
 
-    /* Mobile responsiveness */
+    /* Mobile Responsiveness */
     @media (max-width: 768px) {
       #container {
         flex-direction: column;
+        align-items: center;
       }
 
       #menu {
@@ -106,22 +125,16 @@
 
       #pdf-container {
         width: 100%;
-        margin-left: 0;
+        margin: 0;
       }
 
-      button, input[type=number] {
-        font-size: 14px;
-        padding: 5px;
-      }
-
-      .menu-button {
-        padding: 10px;
-        width: 100%; /* Buttons untereinander auf mobilen Geräten */
-      }
-
-      /* Rechte Navigation auf mobilen Geräten ausblenden */
       #right-navigation {
         display: none;
+      }
+
+      button.menu-button, input[type=number] {
+        font-size: 14px;
+        padding: 5px;
       }
     }
 
@@ -130,11 +143,7 @@
         width: 100%;
       }
 
-      #pdf-container {
-        margin-left: 0;
-      }
-
-      .menu-button {
+      button.menu-button {
         padding: 8px;
       }
     }
@@ -142,12 +151,9 @@
 </head>
 <body>
   <div id="container">
+    <!-- Linkes Menü -->
     <div id="menu">
       <h3>Índice</h3>
-      <!-- Linkes Menü: Alle Buttons außer „Número de Himno“ bleiben -->
-      <!-- Tatsächlich war „Número de Himno“ auch links, oder soll der auch links weg? Du hast nur rechts erwähnt -->
-      <!-- Ich lasse ihn links, weil nur rechts löschen gewünscht -->
-
       <button class="menu-button" onclick="goToNextPage()">Página Siguiente</button>
       <button class="menu-button" onclick="goToPrevPage()">Página Anterior</button>
 
@@ -160,14 +166,17 @@
       <button class="menu-button" onclick="searchByNumber()">Buscar</button>
     </div>
 
+    <!-- PDF Bereich -->
     <div id="pdf-container">
       <canvas id="pdf-render"></canvas>
     </div>
 
-    <!-- Rechtes Menü: Gleiche Funktionen wie links, aber ohne „Número de Himno“, „Atrás“, „Siguiente“ -->
+    <!-- Rechtes Menü (gleiches wie links, außer IDs für Suche angepasst) -->
     <div id="right-navigation">
       <h3>Índice</h3>
-      
+      <button class="menu-button" onclick="goToNextPage()">Página Siguiente</button>
+      <button class="menu-button" onclick="goToPrevPage()">Página Anterior</button>
+
       <h4>Zoom</h4>
       <button class="menu-button" onclick="zoomIn()">Ampliar</button>
       <button class="menu-button" onclick="zoomOut()">Reducir</button>
@@ -226,6 +235,16 @@
       }
     }
 
+    function zoomIn() {
+      currentScale += 0.1;
+      renderPage(pageNum);
+    }
+
+    function zoomOut() {
+      currentScale = Math.max(0.5, currentScale - 0.1);
+      renderPage(pageNum);
+    }
+
     function goToPage(page) {
       pageNum = page;
       queueRenderPage(pageNum);
@@ -245,22 +264,12 @@
       }
     }
 
-    function zoomIn() {
-      currentScale += 0.1;
-      renderPage(pageNum);
-    }
-
-    function zoomOut() {
-      currentScale = Math.max(0.5, currentScale - 0.1);
-      renderPage(pageNum);
-    }
-
-    // Suche links
+    // Suche Funktion linkes Menü
     function searchByNumber() {
       const input = document.getElementById('search-num').value;
       const number = parseInt(input, 10);
       if (number >= 2001 && number <= 2700) {
-        const targetPage = number - 1998; // 2001 = Seite 3
+        const targetPage = number - 1998; // Erste Liednummer 2001 = Seite 3
         if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
           pageNum = targetPage;
           queueRenderPage(pageNum);
@@ -272,12 +281,12 @@
       }
     }
 
-    // Suche rechts (für das rechte Menü)
+    // Suche Funktion rechtes Menü (andere Input-ID)
     function searchByNumberRight() {
       const input = document.getElementById('search-num-right').value;
       const number = parseInt(input, 10);
       if (number >= 2001 && number <= 2700) {
-        const targetPage = number - 1998; // 2001 = Seite 3
+        const targetPage = number - 1998; // Erste Liednummer 2001 = Seite 3
         if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
           pageNum = targetPage;
           queueRenderPage(pageNum);
@@ -293,7 +302,7 @@
       pdfDoc = pdfDoc_;
       renderPage(pageNum);
     }).catch(function(error) {
-      alert('Error loading PDF: ' + error.message);
+      alert('Error al cargar el PDF: ' + error.message);
       console.error(error);
     });
   </script>
