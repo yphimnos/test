@@ -60,6 +60,7 @@
       border-radius: 4px;
       background-color: #008CBA;
       color: white;
+      transition: background-color 0.3s ease;
     }
 
     button:hover {
@@ -70,14 +71,19 @@
       margin-bottom: 10px;
     }
 
-    /* Nur Suchfelder: blauen Fokus-Hintergrund entfernen */
-    .search-input:focus {
-      outline: none;
-      box-shadow: none !important;
+    /* Verhindert blauen Hintergrund beim Fokus auf die Suchfelder */
+    input.search-input:focus {
+      outline: 2px solid #008CBA; /* Optional: sichtbarer Rahmen */
       background-color: white;
-      color: black;
-      -webkit-appearance: none;
-      -moz-appearance: textfield;
+      box-shadow: none;
+    }
+
+    /* Spezielle Buttons für "Portada" und "Notas explicativas" */
+    .menu-special-buttons {
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
 
     /* Verstecke das rechte Menü auf mobilen Geräten */
@@ -95,6 +101,35 @@
       #pdf-container {
         margin-top: 20px;
       }
+
+      /* Spezialbuttons unten anzeigen */
+      .menu-special-buttons {
+        order: 4; /* ganz unten im Menü */
+        margin-top: 20px;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .menu-special-buttons button {
+        flex: 1;
+        max-width: 150px;
+      }
+
+      /* Mobile Layout links-Menü in drei Abschnitte ordnen */
+      #menu {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .menu-top {
+        order: 1;
+      }
+
+      .menu-bottom {
+        order: 3;
+      }
     }
   </style>
 </head>
@@ -102,17 +137,29 @@
   <div id="container">
     <!-- Linkes Menü -->
     <div id="menu">
-      <h3>Índice</h3>
-      <button onclick="goToNextPage()">Página Siguiente</button>
-      <button onclick="goToPrevPage()">Página Anterior</button>
+      <!-- Neue Buttons oben (Desktop), unten (Mobile) -->
+      <div class="menu-special-buttons">
+        <button onclick="goToPortada()">Portada</button>
+        <button onclick="goToNotas()">Notas explicativas</button>
+      </div>
 
-      <h4>Cántico #</h4>
-      <input type="number" id="search-num" class="search-input" min="2001" max="2700" placeholder="Número de Himno" />
-      <button onclick="searchByNumber()">Buscar</button>
+      <!-- Oberer Bereich -->
+      <div class="menu-top">
+        <h3>Índice</h3>
+        <button onclick="goToNextPage()">Página Siguiente</button>
+        <button onclick="goToPrevPage()">Página Anterior</button>
+      </div>
 
-      <h4>Zoom</h4>
-      <button onclick="zoomIn()">Ampliar</button>
-      <button onclick="zoomOut()">Reducir</button>
+      <!-- Unterer Bereich -->
+      <div class="menu-bottom">
+        <h4>Zoom</h4>
+        <button onclick="zoomIn()">Ampliar</button>
+        <button onclick="zoomOut()">Reducir</button>
+
+        <h4>Cántico #</h4>
+        <input type="number" id="search-num" class="search-input" min="2001" max="2700" placeholder="Número de Himno" />
+        <button onclick="searchByNumber()">Buscar</button>
+      </div>
     </div>
 
     <!-- PDF Container -->
@@ -126,13 +173,13 @@
       <button onclick="goToNextPage()">Página Siguiente</button>
       <button onclick="goToPrevPage()">Página Anterior</button>
 
-      <h4>Cántico #</h4>
-      <input type="number" id="search-num-right" class="search-input" min="2001" max="2700" placeholder="Número de Himno" />
-      <button onclick="searchByNumberRight()">Buscar</button>
-
       <h4>Zoom</h4>
       <button onclick="zoomIn()">Ampliar</button>
       <button onclick="zoomOut()">Reducir</button>
+
+      <h4>Cántico #</h4>
+      <input type="number" id="search-num-right" class="search-input" min="2001" max="2700" placeholder="Número de Himno" />
+      <button onclick="searchByNumberRight()">Buscar</button>
     </div>
   </div>
 
@@ -174,7 +221,7 @@
       });
 
       pageNum = num;
-      // Limpia los campos de búsqueda cuando se cambia la página
+      // Update beide Suchfelder auf neue Seite, wenn gewünscht
       document.getElementById('search-num').value = '';
       document.getElementById('search-num-right').value = '';
     }
@@ -211,35 +258,44 @@
       }
     }
 
-    // Buscar desde menú izquierdo
+    // Neue Buttons-Funktionen
+    function goToPortada() {
+      queueRenderPage(1);
+    }
+
+    function goToNotas() {
+      queueRenderPage(2);
+    }
+
+    // Suche links
     function searchByNumber() {
       const input = document.getElementById('search-num').value;
       const number = parseInt(input, 10);
       if (number >= 2001 && number <= 2700) {
-        const targetPage = number - 1998; // 2001 -> página 3
+        const targetPage = number - 1998; // 2001 -> Seite 3
         if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
           queueRenderPage(targetPage);
         } else {
-          alert('Número fuera del rango!');
+          alert('Liednummer außerhalb des Bereichs!');
         }
       } else {
-        alert('Por favor ingresa un número válido entre 2001 y 2700!');
+        alert('Bitte eine gültige Liednummer zwischen 2001 und 2700 eingeben!');
       }
     }
 
-    // Buscar desde menú derecho
+    // Suche rechts (für das rechte Suchfeld)
     function searchByNumberRight() {
       const input = document.getElementById('search-num-right').value;
       const number = parseInt(input, 10);
       if (number >= 2001 && number <= 2700) {
-        const targetPage = number - 1998; // 2001 -> página 3
+        const targetPage = number - 1998; // 2001 -> Seite 3
         if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
           queueRenderPage(targetPage);
         } else {
-          alert('Número fuera del rango!');
+          alert('Liednummer außerhalb des Bereichs!');
         }
       } else {
-        alert('Por favor ingresa un número válido entre 2001 y 2700!');
+        alert('Bitte eine gültige Liednummer zwischen 2001 und 2700 eingeben!');
       }
     }
 
