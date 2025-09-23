@@ -70,6 +70,13 @@
       margin-bottom: 10px;
     }
 
+    input[type=number]:focus {
+      background-color: white;
+      outline: none;
+      box-shadow: none;
+      color: black; /* texto visible */
+    }
+
     /* Verstecke das rechte Menü auf mobilen Geräten */
     @media (max-width: 768px) {
       #right-navigation {
@@ -102,7 +109,7 @@
 
       <h4>Buscar #</h4>
       <input type="number" id="search-num" min="2001" max="2700" placeholder="Número de Himno" />
-      <button onclick="searchByNumber()">Buscar</button>
+      <button onclick="searchByNumber()">Cántico #</button>
     </div>
 
     <!-- PDF Container -->
@@ -122,7 +129,7 @@
 
       <h4>Buscar #</h4>
       <input type="number" id="search-num-right" min="2001" max="2700" placeholder="Número de Himno" />
-      <button onclick="searchByNumberRight()">Buscar</button>
+      <button onclick="searchByNumberRight()">Cántico #</button>
     </div>
   </div>
 
@@ -164,7 +171,7 @@
       });
 
       pageNum = num;
-      // Update beide Suchfelder auf neue Seite, wenn gewünscht
+      // Limpia los campos de búsqueda cuando se cambia la página
       document.getElementById('search-num').value = '';
       document.getElementById('search-num-right').value = '';
     }
@@ -201,35 +208,35 @@
       }
     }
 
-    // Suche links
+    // Buscar desde menú izquierdo
     function searchByNumber() {
       const input = document.getElementById('search-num').value;
       const number = parseInt(input, 10);
       if (number >= 2001 && number <= 2700) {
-        const targetPage = number - 1998; // 2001 -> Seite 3
+        const targetPage = number - 1998; // 2001 -> página 3
         if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
           queueRenderPage(targetPage);
         } else {
-          alert('Liednummer außerhalb des Bereichs!');
+          alert('Número fuera del rango!');
         }
       } else {
-        alert('Bitte eine gültige Liednummer zwischen 2001 und 2700 eingeben!');
+        alert('Por favor ingresa un número válido entre 2001 y 2700!');
       }
     }
 
-    // Suche rechts (für das rechte Suchfeld)
+    // Buscar desde menú derecho
     function searchByNumberRight() {
       const input = document.getElementById('search-num-right').value;
       const number = parseInt(input, 10);
       if (number >= 2001 && number <= 2700) {
-        const targetPage = number - 1998; // 2001 -> Seite 3
+        const targetPage = number - 1998; // 2001 -> página 3
         if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
           queueRenderPage(targetPage);
         } else {
-          alert('Liednummer außerhalb des Bereichs!');
+          alert('Número fuera del rango!');
         }
       } else {
-        alert('Bitte eine gültige Liednummer zwischen 2001 und 2700 eingeben!');
+        alert('Por favor ingresa un número válido entre 2001 y 2700!');
       }
     }
 
