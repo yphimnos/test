@@ -9,24 +9,35 @@
     body {
       font-family: Arial, sans-serif;
       display: flex;
-      justify-content: space-between;
+      justify-content: center; /* Zentriert die gesamte Seite */
       margin: 20px;
+      height: 100vh; /* Stellt sicher, dass der Inhalt den gesamten Bildschirm ausfüllt */
+      align-items: center; /* Zentriert den Inhalt vertikal */
+    }
+
+    #container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1200px; /* Maximale Breite für den Container */
+      align-items: flex-start; /* Sicherstellen, dass alles oben ausgerichtet ist */
     }
 
     #menu {
-      width: 200px;
+      width: 250px; /* Breite des Menüs */
       background-color: #f1f1f1;
       padding: 10px;
       border: 1px solid #ccc;
       height: 100%;
-      overflow-y: auto;
       text-align: center;
     }
 
     #pdf-container {
       flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       position: relative;
-      display: inline-block;
       margin-left: 20px;
     }
 
@@ -37,8 +48,13 @@
     }
 
     #navigation {
-      margin-top: 10px;
-      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
     }
 
     button, input[type=number] {
@@ -70,19 +86,21 @@
   </style>
 </head>
 <body>
-  <div id="menu">
-    <h3>Índice</h3>
-    <button class="menu-button" onclick="goToPage(2)">Número de Himno</button>
-    <button class="menu-button" onclick="goToNextPage()">Página Siguiente</button>
-    <button class="menu-button" onclick="goToPrevPage()">Página Anterior</button>
+  <div id="container">
+    <div id="menu">
+      <h3>Índice</h3>
+      <button class="menu-button" onclick="goToPage(2)">Número de Himno</button>
+      <button class="menu-button" onclick="goToNextPage()">Página Siguiente</button>
+      <button class="menu-button" onclick="goToPrevPage()">Página Anterior</button>
 
-    <h4>Zoom</h4>
-    <button class="menu-button" onclick="zoomIn()">Ampliar</button>
-    <button class="menu-button" onclick="zoomOut()">Reducir</button>
-  </div>
+      <h4>Zoom</h4>
+      <button class="menu-button" onclick="zoomIn()">Ampliar</button>
+      <button class="menu-button" onclick="zoomOut()">Reducir</button>
+    </div>
 
-  <div id="pdf-container">
-    <canvas id="pdf-render"></canvas>
+    <div id="pdf-container">
+      <canvas id="pdf-render"></canvas>
+    </div>
   </div>
 
   <div id="navigation">
