@@ -147,7 +147,7 @@
 
       <!-- Neuer Button "Buscar #" -->
       <h4>Buscar #</h4>
-      <input type="number" id="search-num" min="1000" max="9999" placeholder="Número de Himno" />
+      <input type="number" id="search-num" min="2001" max="2700" placeholder="Número de Himno" />
       <button class="menu-button" onclick="searchByNumber()">Buscar</button>
     </div>
 
@@ -273,12 +273,12 @@
       }
     }
 
-    // Funktion zur Suche nach Liednummer
+    // Funktion zur Suche nach Liednummer mit Offset (2001 = Seite 5)
     function searchByNumber() {
-      const number = document.getElementById('search-num').value;
-      if (number >= 1000 && number <= 9999) {
-        // Annahme: Die Liednummer ist gleich der Seitenzahl
-        const targetPage = parseInt(number, 10);
+      const input = document.getElementById('search-num').value;
+      const number = parseInt(input, 10);
+      if (number >= 2001 && number <= 2700) {
+        const targetPage = number - 1996; // Berechnung der PDF-Seite
         if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
           pageNum = targetPage;
           queueRenderPage(pageNum);
@@ -286,7 +286,7 @@
           alert('Liednummer außerhalb des Bereichs!');
         }
       } else {
-        alert('Bitte eine gültige Liednummer (4 Ziffern) eingeben!');
+        alert('Bitte eine gültige Liednummer zwischen 2001 und 2700 eingeben!');
       }
     }
   </script>
