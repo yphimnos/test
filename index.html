@@ -9,21 +9,21 @@
     body {
       font-family: Arial, sans-serif;
       display: flex;
-      justify-content: center; /* Zentriert die gesamte Seite */
+      justify-content: center;
       margin: 20px;
-      height: 100vh; /* Stellt sicher, dass der Inhalt den gesamten Bildschirm ausfüllt */
-      align-items: flex-start; /* Verhindert vertikale Zentrierung des gesamten Inhalts */
+      height: 100vh;
+      align-items: flex-start;
     }
 
     #container {
       display: flex;
       justify-content: space-between;
       width: 100%;
-      max-width: 1200px; /* Maximale Breite für den Container */
+      max-width: 1200px;
     }
 
     #menu {
-      width: 250px; /* Breite des Menüs */
+      width: 250px;
       background-color: #f1f1f1;
       padding: 10px;
       border: 1px solid #ccc;
@@ -34,7 +34,7 @@
     #pdf-container {
       flex-grow: 1;
       display: flex;
-      justify-content: center; /* Zentriert den PDF-Inhalt horizontal */
+      justify-content: center;
       align-items: center;
       position: relative;
       margin-left: 20px;
@@ -52,8 +52,8 @@
       justify-content: space-between;
       padding: 10px 20px;
       position: absolute;
-      bottom: 10px;
-      right: 0; /* Stellt sicher, dass die Buttons rechts bleiben */
+      top: 10px; /* Buttons nach oben verschoben */
+      right: 0;
       width: auto;
     }
 
@@ -87,47 +87,48 @@
     /* Mobile responsiveness */
     @media (max-width: 768px) {
       #container {
-        flex-direction: column; /* Das Layout wird in eine Spaltenanordnung umgestellt */
+        flex-direction: column;
       }
 
       #menu {
-        width: 100%; /* Das Menü nimmt die volle Breite ein */
-        margin-bottom: 20px; /* Abstand zwischen Menü und PDF-Inhalt */
-        font-size: 14px; /* Kleinere Schrift im Menü */
-        padding: 5px; /* Weniger Abstand */
+        width: 100%;
+        margin-bottom: 20px;
+        font-size: 14px;
+        padding: 5px;
       }
 
       #pdf-container {
-        width: 100%; /* Der PDF-Inhalt nimmt die gesamte Breite ein */
-        margin-left: 0; /* Kein Abstand mehr */
+        width: 100%;
+        margin-left: 0;
       }
 
       button, input[type=number] {
-        font-size: 14px; /* Kleinere Schriftgrößen auf mobilen Geräten */
+        font-size: 14px;
         padding: 5px;
       }
 
       .menu-button {
-        padding: 10px; /* Etwas größere Buttons auf kleinen Bildschirmen */
+        padding: 10px;
+        width: 100%; /* Buttons untereinander auf mobilen Geräten */
       }
 
       /* Verstecke die Navigationsbuttons „Atrás“ und „Siguiente“ auf mobilen Geräten */
       #navigation {
-        display: none; /* Die Buttons werden auf mobilen Geräten ausgeblendet */
+        display: none;
       }
     }
 
     @media (max-width: 480px) {
       #menu {
-        width: 100%; /* Menü nimmt volle Breite auf sehr kleinen Geräten ein */
+        width: 100%;
       }
 
       #pdf-container {
-        margin-left: 0; /* PDF-Inhalt nimmt volle Breite ein */
+        margin-left: 0;
       }
 
       .menu-button {
-        padding: 8px; /* Anpassung der Buttons auf kleinen Geräten */
+        padding: 8px;
       }
     }
   </style>
@@ -143,6 +144,11 @@
       <h4>Zoom</h4>
       <button class="menu-button" onclick="zoomIn()">Ampliar</button>
       <button class="menu-button" onclick="zoomOut()">Reducir</button>
+
+      <!-- Neuer Button "Buscar #" -->
+      <h4>Buscar #</h4>
+      <input type="number" id="search-num" min="1000" max="9999" placeholder="Número de Himno" />
+      <button class="menu-button" onclick="searchByNumber()">Buscar</button>
     </div>
 
     <div id="pdf-container">
@@ -150,6 +156,7 @@
     </div>
   </div>
 
+  <!-- Navigationsbuttons nach oben verschoben -->
   <div id="navigation">
     <button id="prev-page">Atrás</button>
     <input type="number" id="page-num" min="1" value="1" style="width: 50px;" />
@@ -165,7 +172,7 @@
         pageRendering = false,
         pageNumPending = null;
 
-    let currentScale = 1.5; // Initialer Zoomfaktor
+    let currentScale = 1.5;
 
     const canvas = document.getElementById('pdf-render');
     const ctx = canvas.getContext('2d');
@@ -238,12 +245,12 @@
     });
 
     function zoomIn() {
-      currentScale += 0.1; // Vergrößern
+      currentScale += 0.1;
       renderPage(pageNum);
     }
 
     function zoomOut() {
-      currentScale = Math.max(0.5, currentScale - 0.1); // Verkleinern
+      currentScale = Math.max(0.5, currentScale - 0.1);
       renderPage(pageNum);
     }
 
@@ -263,6 +270,23 @@
       if (pageNum > 1) {
         pageNum--;
         queueRenderPage(pageNum);
+      }
+    }
+
+    // Funktion zur Suche nach Liednummer
+    function searchByNumber() {
+      const number = document.getElementById('search-num').value;
+      if (number >= 1000 && number <= 9999) {
+        // Annahme: Die Liednummer ist gleich der Seitenzahl
+        const targetPage = parseInt(number, 10);
+        if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
+          pageNum = targetPage;
+          queueRenderPage(pageNum);
+        } else {
+          alert('Liednummer außerhalb des Bereichs!');
+        }
+      } else {
+        alert('Bitte eine gültige Liednummer (4 Ziffern) eingeben!');
       }
     }
   </script>
