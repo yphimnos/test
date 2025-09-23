@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Viewer mit interaktivem Menü</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: space-between;
+      margin: 20px;
+    }
+
+    #menu {
+      width: 200px;
+      background-color: #f1f1f1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      height: 100%;
+      overflow-y: auto;
+      text-align: center; /* Zentriert alles im Menü */
+    }
+
+    #pdf-container {
+      flex-grow: 1;
+      position: relative;
+      display: inline-block;
+      margin-left: 20px;
+    }
+
+    canvas {
+      border: 1px solid #ccc;
+      max-width: 100%;
+      height: auto;
+    }
+
+    #navigation {
+      margin-top: 10px;
+      text-align: center;
+    }
+
+    button, input[type=number] {
+      font-size: 16px;
+      margin: 0 5px;
+      padding: 5px 10px;
+    }
+
+    .menu-button {
+      display: inline-block; /* Zeigt Buttons nebeneinander an */
+      margin: 5px 0;
+      padding: 8px;
+      background-color: #008CBA;
+      color: white;
+      text-align: center;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .menu-button:hover {
+      background-color: #007B9A;
+    }
+
+    /* Zentrieren der Überschrift */
+    #menu h3 {
+      text-align: center; /* Zentriert die Überschrift */
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div id="menu">
+    <!-- Zentrierte Überschrift -->
+    <h3>Indice</h3>
+    
+    <!-- Navigationsbuttons -->
+    <button class="menu-button" onclick="goToPage(2)">Numero de Himno</button>
+
+    <!-- Buttons für Nächste und Vorherige Seite (auf Spanisch) -->
+    <button class="menu-button" onclick="goToNextPage()">Siguiente Página</button>
+    <button class="menu-button" onclick="goToPrevPage()">Página Anterior</button>
+
+    <!-- Zoom-Funktion -->
+    <h4>Zoom</h4>
+    <button class="menu-button" onclick="zoomIn()">Vergrößern</button>
+    <button class="menu-button" onclick="zoomOut()">Verkleinern</button>
+  </div>
+
+  <div id="pdf-container">
+    <canvas id="pdf-render"></canvas>
+  </div>
+
+  <div id="navigation">
+    <button id="prev-page">Zurück</button>
+    <input type="number" id="page-num" min="1" value="1" style="width: 50px;" />
+    <span id="page-count"></span>
+    <button id="next-page">Weiter</button>
+  </div>
+
+  <script>
+    const url = 'meinedatei.pdf'; // Hier den PDF-Dateinamen eintragen
+
+    let pdfDoc = null,
+        pageNum = 1,
+        pageRendering = false,
+        pageNumPending = null;
+
+    const scale = 1.5;
+    const canvas = document.getElementById('pdf-render');
+    const ctx = canvas.getContext('2d');
+
+    function renderPage(num) {
+      pageRendering = true;
+
+      pdfDoc.getPage(num).then(function(page) {
+        const viewport = page.getViewport({ scale: scale });
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        const renderContext = {
+          canvasContext: ctx,
+          viewport: viewport
+        };
+        const renderTask = page.render(renderContext);
+
+        renderTask.promise.then(function() {
+          pageRendering = false;
+
+          // Annotation Layer rendern (für Links und interaktive Elemente)
+          page.getAnnotations().then(function(annotationsData) {
+            const annotationLayerDiv = document.createElement("div");
+            annotationLayerDiv.className = "annotationLayer";
+            annotationLayerDiv.style.position = "absolute";
+            annotationLayerDiv.style.top = "0";
+            annotationLayerDiv.style.left = "0";
+            annotationLayerDiv.style.height = canvas.height + "px";
+            annotationLayerDiv.style.width = canvas.width + "px";
+            annotationLayerDiv.style.zIndex = 2;
+
+            pdfContainer.appendChild(annotationLayerDiv);
+
+            pdfjsLib.AnnotationLayer.render({
+              annotations: annotationsData,
+              div: annotationLayerDiv,
+              page: page,
+              viewport: viewport.clone({ dontFlip: true }),
+              linkService: {
+                navigateTo: function(dest) {
+                  console.log("Navigieren zu:", dest);
+                },
+                getDestinationHash: function(dest) {
+                  return "#";
+                },
+                externalLinkTarget: 2 // öffnet Links in einem neuen Tab
+              }
+            });
+          });
+
+          if (pageNumPending !== null) {
+            renderPage(pageNumPending);
+            pageNumPending = null;
+          }
+        });
+      });
+
+      document.getElementById('page-num').value = num;
+    }
+
+    function queueRenderPage(num) {
+      if (pageRendering) {
+        pageNumPending = num;
+      } else {
+        renderPage(num);
+      }
+    }
+
+    document.getElementById('prev-page').addEventListener('click', function() {
+      if (pageNum <= 1) return;
+      pageNum--;
+      queueRenderPage(pageNum);
+    });
+
+    document.getElementById('next-page').addEventListener('click', function() {
+      if (pageNum >= pdfDoc.numPages) return;
+      pageNum++;
+      queueRenderPage(pageNum);
+    });
+
+    document.getElementById('page-num').addEventListener('change', function() {
+      let desiredPage = Number(this.value);
+      if (desiredPage >= 1 && desiredPage <= pdfDoc.numPages) {
+        pageNum = desiredPage;
+        queueRenderPage(pageNum);
+      } else {
+        alert("Seitenzahl außerhalb des gültigen Bereichs!");
+        this.value = pageNum;
+      }
+    });
+
+    pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+      pdfDoc = pdfDoc_;
+      document.getElementById('page-count').textContent = '/ ' + pdfDoc.numPages;
+      renderPage(pageNum);
+    }).catch(function(error) {
+      alert('Fehler beim Laden der PDF: ' + error.message);
+    });
+
+    // Navigiere zu einer bestimmten Seite
+    function goToPage(page) {
+      pageNum = page;
+      queueRenderPage(pageNum);
+    }
+
+    // Funktion für die Navigation zur nächsten Seite
+    function goToNextPage() {
+      if (pageNum < pdfDoc.numPages) {
+        pageNum++;
+        queueRenderPage(pageNum);
+      }
+    }
+
+    // Funktion für die Navigation zur vorherigen Seite
+    function goToPrevPage() {
+      if (pageNum > 1) {
+        pageNum--;
+        queueRenderPage(pageNum);
+      }
+    }
+
+    // Zoom-Funktion
+    function zoomIn() {
+      scale += 0.5; // Vergrößern
+      renderPage(pageNum);
+    }
+
+    function zoomOut() {
+      scale -= 0.5; // Verkleinern
+      renderPage(pageNum);
+    }
+  </script>
+</body>
+</html>
