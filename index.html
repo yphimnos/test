@@ -13,7 +13,6 @@
       margin: 20px;
       height: 100vh;
       align-items: flex-start;
-      position: relative;
     }
 
     #container {
@@ -30,11 +29,9 @@
       border: 1px solid #ccc;
       height: 100%;
       text-align: center;
-      box-sizing: border-box;
-    }
-
-    #menu-right {
-      margin-left: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     #pdf-container {
@@ -54,10 +51,66 @@
 
     button, input[type=number] {
       font-size: 16px;
+      margin: 0 5px;
+      padding: 5px 10px;
+    }
+
+    .menu-button {
+      display: inline-block;
       margin: 5px 0;
-      padding: 8px 10px;
+      padding: 8px;
+      background-color: #008CBA;
+      color: white;
+      text-align: center;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
       width: 100%;
       box-sizing: border-box;
+    }
+
+    .menu-button:hover {
+      background-color: #007B9A;
+    }
+
+    #menu h3, #menu-right h3 {
+      text-align: center;
+      margin-bottom: 15px;
+      width: 100%;
+    }
+
+    #menu h4, #menu-right h4 {
+      margin-top: 20px;
+      margin-bottom: 8px;
+      width: 100%;
+      text-align: left;
+      padding-left: 5px;
+    }
+
+    input[type=number]#search-num, input[type=number]#search-num-right {
+      width: 100%;
+      padding: 6px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: white;
+      box-sizing: border-box;
+      margin-bottom: 8px;
+    }
+
+    /* Container für neue Navigation oben */
+    .nav-top-buttons {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-bottom: 15px;
+      gap: 10px;
+    }
+
+    .nav-top-buttons button {
+      flex: 1;
+      padding: 8px 10px;
+      font-size: 16px;
       cursor: pointer;
       border: none;
       border-radius: 4px;
@@ -66,37 +119,33 @@
       transition: background-color 0.3s ease;
     }
 
-    button:hover {
+    .nav-top-buttons button:hover {
       background-color: #007B9A;
     }
 
-    #menu h3, #menu-right h3 {
-      text-align: center;
-      margin-bottom: 15px;
-      font-weight: bold;
-    }
-
-    #menu h4, #menu-right h4 {
-      margin-top: 15px;
-      margin-bottom: 8px;
-      font-weight: bold;
-    }
-
-    #navigation-bottom {
-      position: fixed;
-      bottom: 20px;
-      width: 100%;
-      max-width: 1200px;
+    /* Container für Pfeil-Buttons unter Menü */
+    .nav-bottom-buttons {
+      margin-top: auto;
       display: flex;
       justify-content: space-between;
-      padding: 0 10px;
-      box-sizing: border-box;
-      pointer-events: none; /* damit Buttons nur bei aktivem Pointerclick */
+      gap: 10px;
+      width: 100%;
     }
 
-    #navigation-bottom button {
-      width: 100px;
-      pointer-events: auto;
+    .nav-bottom-buttons button {
+      width: 48%;
+      padding: 8px 10px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background-color: #008CBA;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+
+    .nav-bottom-buttons button:hover {
+      background-color: #007B9A;
     }
 
     /* Mobile responsiveness */
@@ -119,16 +168,31 @@
 
       button, input[type=number] {
         font-size: 14px;
-        padding: 7px 8px;
+        padding: 5px;
       }
 
+      .menu-button {
+        padding: 10px;
+        width: 100%; /* Buttons untereinander auf mobilen Geräten */
+      }
+
+      /* Rechtes Menü ausblenden */
       #menu-right {
         display: none;
       }
+    }
 
-      #navigation-bottom {
-        max-width: 100%;
-        padding: 0 5px;
+    @media (max-width: 480px) {
+      #menu, #menu-right {
+        width: 100%;
+      }
+
+      #pdf-container {
+        margin-left: 0;
+      }
+
+      .menu-button {
+        padding: 8px;
       }
     }
   </style>
@@ -138,21 +202,30 @@
     <!-- Linkes Menü -->
     <div id="menu">
       <h3>Índice</h3>
-      <button onclick="goToPage(1)">Portada</button>
-      <button onclick="goToPage(2)">Notas explicativas</button>
-      <button onclick="goToNextPage()">Página Siguiente</button>
-      <button onclick="goToPrevPage()">Página Anterior</button>
+
+      <div class="nav-top-buttons">
+        <button class="menu-button" onclick="goToPage(1)">Portada</button>
+        <button class="menu-button" onclick="goToPage(2)">Notas explicativas</button>
+      </div>
+
+      <button class="menu-button" onclick="goToPage(3)">Página siguiente</button>
+      <button class="menu-button" onclick="goToPrevPage()">Página anterior</button>
 
       <h4>Zoom</h4>
-      <button onclick="zoomIn()">Ampliar</button>
-      <button onclick="zoomOut()">Reducir</button>
+      <button class="menu-button" onclick="zoomIn()">Ampliar</button>
+      <button class="menu-button" onclick="zoomOut()">Reducir</button>
 
       <h4>Cántico #</h4>
-      <input type="number" id="search-num-left" min="2001" max="2700" placeholder="Número de Himno" />
-      <button onclick="searchByNumber()">Buscar</button>
+      <input type="number" id="search-num" min="2001" max="2700" placeholder="Número de Himno" />
+      <button class="menu-button" onclick="searchByNumber()">Buscar</button>
+
+      <div class="nav-bottom-buttons">
+        <button id="prev-left">&larr; Atrás</button>
+        <button id="next-left">Siguiente &rarr;</button>
+      </div>
     </div>
 
-    <!-- PDF Bereich -->
+    <!-- PDF Container -->
     <div id="pdf-container">
       <canvas id="pdf-render"></canvas>
     </div>
@@ -160,34 +233,37 @@
     <!-- Rechtes Menü -->
     <div id="menu-right">
       <h3>Índice</h3>
-      <button onclick="goToPage(1)">Portada</button>
-      <button onclick="goToPage(2)">Notas explicativas</button>
-      <button onclick="goToNextPage()">Página Siguiente</button>
-      <button onclick="goToPrevPage()">Página Anterior</button>
+
+      <div class="nav-top-buttons">
+        <button class="menu-button" onclick="goToPage(1)">Portada</button>
+        <button class="menu-button" onclick="goToPage(2)">Notas explicativas</button>
+      </div>
+
+      <button class="menu-button" onclick="goToPage(3)">Página siguiente</button>
+      <button class="menu-button" onclick="goToPrevPage()">Página anterior</button>
 
       <h4>Zoom</h4>
-      <button onclick="zoomIn()">Ampliar</button>
-      <button onclick="zoomOut()">Reducir</button>
+      <button class="menu-button" onclick="zoomIn()">Ampliar</button>
+      <button class="menu-button" onclick="zoomOut()">Reducir</button>
 
       <h4>Cántico #</h4>
       <input type="number" id="search-num-right" min="2001" max="2700" placeholder="Número de Himno" />
-      <button onclick="searchByNumber()">Buscar</button>
-    </div>
-  </div>
+      <button class="menu-button" onclick="searchByNumberRight()">Buscar</button>
 
-  <!-- Unten Navigationsbuttons -->
-  <div id="navigation-bottom">
-    <button id="prev-bottom">&larr; Atrás</button>
-    <button id="next-bottom">Siguiente &rarr;</button>
+      <div class="nav-bottom-buttons">
+        <button id="prev-right">&larr; Atrás</button>
+        <button id="next-right">Siguiente &rarr;</button>
+      </div>
+    </div>
   </div>
 
   <script>
     const url = 'meinedatei.pdf'; // Hier den PDF-Dateinamen eintragen
 
     let pdfDoc = null,
-        pageNum = 1,
-        pageRendering = false,
-        pageNumPending = null;
+      pageNum = 1,
+      pageRendering = false,
+      pageNumPending = null;
 
     let currentScale = 1.5;
 
@@ -217,6 +293,8 @@
           }
         });
       });
+
+      document.getElementById('page-num')?.value = num;
     }
 
     function queueRenderPage(num) {
@@ -225,8 +303,45 @@
       } else {
         renderPage(num);
       }
-      pageNum = num;
     }
+
+    // Button Event-Listener Pfeile links
+    document.getElementById('prev-left').addEventListener('click', () => {
+      if (pageNum > 1) {
+        pageNum--;
+        queueRenderPage(pageNum);
+      }
+    });
+
+    document.getElementById('next-left').addEventListener('click', () => {
+      if (pageNum < pdfDoc.numPages) {
+        pageNum++;
+        queueRenderPage(pageNum);
+      }
+    });
+
+    // Button Event-Listener Pfeile rechts
+    document.getElementById('prev-right').addEventListener('click', () => {
+      if (pageNum > 1) {
+        pageNum--;
+        queueRenderPage(pageNum);
+      }
+    });
+
+    document.getElementById('next-right').addEventListener('click', () => {
+      if (pageNum < pdfDoc.numPages) {
+        pageNum++;
+        queueRenderPage(pageNum);
+      }
+    });
+
+    pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+      pdfDoc = pdfDoc_;
+      renderPage(pageNum);
+    }).catch(function(error) {
+      alert('Error al cargar el PDF: ' + error.message);
+      console.error(error);
+    });
 
     function zoomIn() {
       currentScale += 0.1;
@@ -240,7 +355,8 @@
 
     function goToPage(page) {
       if (page >= 1 && page <= pdfDoc.numPages) {
-        queueRenderPage(page);
+        pageNum = page;
+        queueRenderPage(pageNum);
       }
     }
 
@@ -258,18 +374,15 @@
       }
     }
 
+    // Suche links
     function searchByNumber() {
-      // Wert von beiden Suchfeldern nehmen, falls links leer rechts prüfen
-      let inputLeft = document.getElementById('search-num-left').value;
-      let inputRight = document.getElementById('search-num-right').value;
-      let input = inputLeft || inputRight;
-
+      const input = document.getElementById('search-num').value;
       const number = parseInt(input, 10);
       if (number >= 2001 && number <= 2700) {
-        // Neue Offset-Berechnung: 2001 auf Seite 3
-        const targetPage = number - 1998;
+        const targetPage = number - 1998; // 2001 = Seite 3
         if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
-          queueRenderPage(targetPage);
+          pageNum = targetPage;
+          queueRenderPage(pageNum);
         } else {
           alert('Liednummer außerhalb des Bereichs!');
         }
@@ -278,21 +391,22 @@
       }
     }
 
-    document.getElementById('prev-bottom').addEventListener('click', () => {
-      goToPrevPage();
-    });
-
-    document.getElementById('next-bottom').addEventListener('click', () => {
-      goToNextPage();
-    });
-
-    pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
-      pdfDoc = pdfDoc_;
-      renderPage(pageNum);
-    }).catch(function(error) {
-      alert('Error loading PDF: ' + error.message);
-      console.error(error);
-    });
+    // Suche rechts (separat, falls notwendig)
+    function searchByNumberRight() {
+      const input = document.getElementById('search-num-right').value;
+      const number = parseInt(input, 10);
+      if (number >= 2001 && number <= 2700) {
+        const targetPage = number - 1998; // 2001 = Seite 3
+        if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
+          pageNum = targetPage;
+          queueRenderPage(pageNum);
+        } else {
+          alert('Liednummer außerhalb des Bereichs!');
+        }
+      } else {
+        alert('Bitte eine gültige Liednummer zwischen 2001 und 2700 eingeben!');
+      }
+    }
   </script>
 </body>
 </html>
