@@ -20,7 +20,7 @@
       justify-content: center;
       width: 100%;
       max-width: 1200px;
-      gap: 20px; /* Abstand zwischen links-PDF-rechts */
+      gap: 20px;
       position: relative;
     }
 
@@ -35,21 +35,15 @@
       font-family: Arial, sans-serif;
     }
 
-    #pdf-container {
-      flex-grow: 1;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      max-width: calc(100% - 540px); /* 250px + 20px + 250px + 20px */
+    /* Linkes Menü - Überschriften zentriert */
+    #menu h3, #menu h4 {
+      text-align: center;
+      margin-bottom: 10px;
     }
 
-    canvas {
-      border: 1px solid #ccc;
-      max-width: 100%;
-      height: auto;
-    }
-
-    button, input[type=number] {
+    /* Buttons & Inputs zentriert */
+    #menu button, #menu input[type=number] {
+      text-align: center;
       font-size: 16px;
       margin: 5px 0;
       padding: 8px 10px;
@@ -60,33 +54,87 @@
       border-radius: 4px;
       background-color: #008CBA;
       color: white;
-      transition: background-color 0.3s ease;
     }
 
-    button:hover {
+    /* Ausnahme Suchfeld mit weißem Hintergrund und ohne blauen Fokus */
+    #menu input[type=number] {
+      background-color: white;
+      color: black;
+      border: 1px solid #ccc;
+    }
+    #menu input[type=number]:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #008CBA;
+      background-color: white;
+      color: black;
+    }
+
+    #menu button:hover {
       background-color: #007B9A;
     }
 
-    h3, h4 {
-      margin-bottom: 10px;
-    }
-
-    /* Verhindert blauen Hintergrund beim Fokus auf die Suchfelder */
-    input.search-input:focus {
-      outline: 2px solid #008CBA; /* Optional: sichtbarer Rahmen */
-      background-color: white;
-      box-shadow: none;
-    }
-
-    /* Spezielle Buttons für "Portada" und "Notas explicativas" */
+    /* Spezielle Container für Buttons in Index */
     .menu-special-buttons {
       margin-bottom: 15px;
       display: flex;
       flex-direction: column;
       gap: 8px;
+      text-align: center;
     }
 
-    /* Verstecke das rechte Menü auf mobilen Geräten */
+    #pdf-container {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      max-width: calc(100% - 540px);
+    }
+
+    canvas {
+      border: 1px solid #ccc;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Rechtes Menü identisch mit links (außer Suchfeld) */
+    #right-navigation {
+      width: 250px;
+      background-color: #f1f1f1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      height: auto;
+      text-align: center;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    #right-navigation button, #right-navigation input[type=number] {
+      font-size: 16px;
+      margin: 5px 0;
+      padding: 8px 10px;
+      width: 100%;
+      box-sizing: border-box;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background-color: #008CBA;
+      color: white;
+    }
+    #right-navigation button:hover {
+      background-color: #007B9A;
+    }
+    #right-navigation input[type=number] {
+      background-color: white;
+      color: black;
+      border: 1px solid #ccc;
+    }
+    #right-navigation input[type=number]:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #008CBA;
+      background-color: white;
+      color: black;
+    }
+
+    /* Mobile Styles */
     @media (max-width: 768px) {
       #right-navigation {
         display: none;
@@ -99,66 +147,75 @@
         max-width: none;
       }
       #pdf-container {
-        margin-top: 20px;
-      }
-
-      /* Spezialbuttons unten anzeigen */
-      .menu-special-buttons {
-        order: 4; /* ganz unten im Menü */
-        margin-top: 20px;
-        width: 100%;
+        margin-top: 10px;
+        order: 2; /* PDF Inhalt direkt nach obere Menüpunkte */
         display: flex;
         justify-content: center;
-        gap: 10px;
+        align-items: center;
       }
-
-      .menu-special-buttons button {
-        flex: 1;
-        max-width: 150px;
-      }
-
-      /* Mobile Layout links-Menü in drei Abschnitte ordnen */
       #menu {
+        /* Flex Layout für Mobile links */
         display: flex;
         flex-direction: column;
+        gap: 10px;
       }
-
-      .menu-top {
-        order: 1;
+      /* Obere Gruppe: Índice + Portada + Notas + Navegar a */
+      .menu-top-mobile {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
       }
-
+      /* Rest (Cántico, Zoom) nach unten */
       .menu-bottom {
         order: 3;
+      }
+      /* Buttons „Portada“ und „Notas“ auch unten anzeigen */
+      .menu-special-buttons-mobile {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 15px;
+        text-align: center;
       }
     }
   </style>
 </head>
 <body>
   <div id="container">
+
     <!-- Linkes Menü -->
     <div id="menu">
-      <!-- Neue Buttons oben (Desktop), unten (Mobile) -->
-      <div class="menu-special-buttons">
-        <button onclick="goToPortada()">Portada</button>
-        <button onclick="goToNotas()">Notas explicativas</button>
-      </div>
-
-      <!-- Oberer Bereich -->
-      <div class="menu-top">
+      <!-- Mobile: obere Gruppe -->
+      <div class="menu-top-mobile">
         <h3>Índice</h3>
+        <div class="menu-special-buttons">
+          <button onclick="goToPortada()">Portada</button>
+          <button onclick="goToNotas()">Notas explicativas</button>
+        </div>
+
+        <h3>Navegar a:</h3>
         <button onclick="goToNextPage()">Página Siguiente</button>
         <button onclick="goToPrevPage()">Página Anterior</button>
       </div>
 
-      <!-- Unterer Bereich -->
+      <!-- PDF Inhalt wird hier in mobile Reihenfolge unter Navigation angezeigt -->
+      <!-- (nur der PDF Container, nicht hier im Menü) -->
+
+      <!-- Mobile: untere Gruppe -->
       <div class="menu-bottom">
+        <h4>Cántico #</h4>
+        <input type="number" id="search-num" min="2001" max="2700" placeholder="Número de Himno" />
+        <button onclick="searchByNumber()">Buscar</button>
+
         <h4>Zoom</h4>
         <button onclick="zoomIn()">Ampliar</button>
         <button onclick="zoomOut()">Reducir</button>
 
-        <h4>Cántico #</h4>
-        <input type="number" id="search-num" class="search-input" min="2001" max="2700" placeholder="Número de Himno" />
-        <button onclick="searchByNumber()">Buscar</button>
+        <!-- Mobile: zusätzliche Buttons unten anzeigen -->
+        <div class="menu-special-buttons-mobile" style="display:none;">
+          <button onclick="goToPortada()">Portada</button>
+          <button onclick="goToNotas()">Notas explicativas</button>
+        </div>
       </div>
     </div>
 
@@ -167,7 +224,7 @@
       <canvas id="pdf-render"></canvas>
     </div>
 
-    <!-- Rechtes Menü (Gleicher Inhalt wie links) -->
+    <!-- Rechtes Menü -->
     <div id="right-navigation">
       <h3>Índice</h3>
       <button onclick="goToNextPage()">Página Siguiente</button>
@@ -178,7 +235,7 @@
       <button onclick="zoomOut()">Reducir</button>
 
       <h4>Cántico #</h4>
-      <input type="number" id="search-num-right" class="search-input" min="2001" max="2700" placeholder="Número de Himno" />
+      <input type="number" id="search-num-right" min="2001" max="2700" placeholder="Número de Himno" />
       <button onclick="searchByNumberRight()">Buscar</button>
     </div>
   </div>
@@ -196,6 +253,7 @@
     const canvas = document.getElementById('pdf-render');
     const ctx = canvas.getContext('2d');
 
+    // PDF Seiten rendern
     function renderPage(num) {
       pageRendering = true;
 
@@ -221,7 +279,7 @@
       });
 
       pageNum = num;
-      // Update beide Suchfelder auf neue Seite, wenn gewünscht
+      // Suchfelder zurücksetzen
       document.getElementById('search-num').value = '';
       document.getElementById('search-num-right').value = '';
     }
@@ -234,6 +292,7 @@
       }
     }
 
+    // Zoom Funktionen
     function zoomIn() {
       currentScale += 0.1;
       renderPage(pageNum);
@@ -244,6 +303,7 @@
       renderPage(pageNum);
     }
 
+    // Navigation
     function goToNextPage() {
       if (pageNum < pdfDoc.numPages) {
         pageNum++;
@@ -258,7 +318,7 @@
       }
     }
 
-    // Neue Buttons-Funktionen
+    // Neue Buttons: Portada (Seite 1) und Notas explicativas (Seite 2)
     function goToPortada() {
       queueRenderPage(1);
     }
@@ -267,7 +327,7 @@
       queueRenderPage(2);
     }
 
-    // Suche links
+    // Suchfunktion links
     function searchByNumber() {
       const input = document.getElementById('search-num').value;
       const number = parseInt(input, 10);
@@ -283,7 +343,7 @@
       }
     }
 
-    // Suche rechts (für das rechte Suchfeld)
+    // Suchfunktion rechts
     function searchByNumberRight() {
       const input = document.getElementById('search-num-right').value;
       const number = parseInt(input, 10);
@@ -299,9 +359,22 @@
       }
     }
 
+    // PDF laden und initial anzeigen
     pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
       pdfDoc = pdfDoc_;
       renderPage(pageNum);
+
+      // Mobile: Zusätzliche Buttons unten sichtbar machen
+      function checkMobile() {
+        const specialBtnsMobile = document.querySelector('.menu-special-buttons-mobile');
+        if (window.innerWidth <= 768) {
+          specialBtnsMobile.style.display = 'flex';
+        } else {
+          specialBtnsMobile.style.display = 'none';
+        }
+      }
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
     }).catch(function(error) {
       alert('Error al cargar el PDF: ' + error.message);
       console.error(error);
