@@ -13,26 +13,28 @@
       margin: 20px;
       height: 100vh;
       align-items: flex-start;
+      position: relative;
     }
 
     #container {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       width: 100%;
       max-width: 1200px;
-      gap: 20px; /* Abstand zwischen links-PDF-rechts */
-      position: relative;
     }
 
-    #menu, #right-navigation {
+    #menu, #menu-right {
       width: 250px;
       background-color: #f1f1f1;
       padding: 10px;
       border: 1px solid #ccc;
-      height: auto;
+      height: 100%;
       text-align: center;
       box-sizing: border-box;
-      font-family: Arial, sans-serif;
+    }
+
+    #menu-right {
+      margin-left: 20px;
     }
 
     #pdf-container {
@@ -40,7 +42,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      max-width: calc(100% - 540px); /* 250px + 20px + 250px + 20px */
+      position: relative;
+      margin-left: 20px;
     }
 
     canvas {
@@ -60,30 +63,72 @@
       border-radius: 4px;
       background-color: #008CBA;
       color: white;
+      transition: background-color 0.3s ease;
     }
 
     button:hover {
       background-color: #007B9A;
     }
 
-    h3, h4 {
-      margin-bottom: 10px;
+    #menu h3, #menu-right h3 {
+      text-align: center;
+      margin-bottom: 15px;
+      font-weight: bold;
     }
 
-    /* Verstecke das rechte Menü auf mobilen Geräten */
+    #menu h4, #menu-right h4 {
+      margin-top: 15px;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    #navigation-bottom {
+      position: fixed;
+      bottom: 20px;
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      justify-content: space-between;
+      padding: 0 10px;
+      box-sizing: border-box;
+      pointer-events: none; /* damit Buttons nur bei aktivem Pointerclick */
+    }
+
+    #navigation-bottom button {
+      width: 100px;
+      pointer-events: auto;
+    }
+
+    /* Mobile responsiveness */
     @media (max-width: 768px) {
-      #right-navigation {
-        display: none;
-      }
       #container {
         flex-direction: column;
       }
-      #menu, #pdf-container {
+
+      #menu, #menu-right {
         width: 100%;
-        max-width: none;
+        margin-bottom: 20px;
+        font-size: 14px;
+        padding: 5px;
       }
+
       #pdf-container {
-        margin-top: 20px;
+        width: 100%;
+        margin-left: 0;
+      }
+
+      button, input[type=number] {
+        font-size: 14px;
+        padding: 7px 8px;
+      }
+
+      #menu-right {
+        display: none;
+      }
+
+      #navigation-bottom {
+        max-width: 100%;
+        padding: 0 5px;
       }
     }
   </style>
@@ -93,6 +138,8 @@
     <!-- Linkes Menü -->
     <div id="menu">
       <h3>Índice</h3>
+      <button onclick="goToPage(1)">Portada</button>
+      <button onclick="goToPage(2)">Notas explicativas</button>
       <button onclick="goToNextPage()">Página Siguiente</button>
       <button onclick="goToPrevPage()">Página Anterior</button>
 
@@ -100,19 +147,21 @@
       <button onclick="zoomIn()">Ampliar</button>
       <button onclick="zoomOut()">Reducir</button>
 
-      <h4>Buscar #</h4>
-      <input type="number" id="search-num" min="2001" max="2700" placeholder="Número de Himno" />
+      <h4>Cántico #</h4>
+      <input type="number" id="search-num-left" min="2001" max="2700" placeholder="Número de Himno" />
       <button onclick="searchByNumber()">Buscar</button>
     </div>
 
-    <!-- PDF Container -->
+    <!-- PDF Bereich -->
     <div id="pdf-container">
       <canvas id="pdf-render"></canvas>
     </div>
 
-    <!-- Rechtes Menü (Gleicher Inhalt wie links) -->
-    <div id="right-navigation">
+    <!-- Rechtes Menü -->
+    <div id="menu-right">
       <h3>Índice</h3>
+      <button onclick="goToPage(1)">Portada</button>
+      <button onclick="goToPage(2)">Notas explicativas</button>
       <button onclick="goToNextPage()">Página Siguiente</button>
       <button onclick="goToPrevPage()">Página Anterior</button>
 
@@ -120,10 +169,16 @@
       <button onclick="zoomIn()">Ampliar</button>
       <button onclick="zoomOut()">Reducir</button>
 
-      <h4>Buscar #</h4>
+      <h4>Cántico #</h4>
       <input type="number" id="search-num-right" min="2001" max="2700" placeholder="Número de Himno" />
-      <button onclick="searchByNumberRight()">Buscar</button>
+      <button onclick="searchByNumber()">Buscar</button>
     </div>
+  </div>
+
+  <!-- Unten Navigationsbuttons -->
+  <div id="navigation-bottom">
+    <button id="prev-bottom">&larr; Atrás</button>
+    <button id="next-bottom">Siguiente &rarr;</button>
   </div>
 
   <script>
@@ -162,11 +217,6 @@
           }
         });
       });
-
-      pageNum = num;
-      // Update beide Suchfelder auf neue Seite, wenn gewünscht
-      document.getElementById('search-num').value = '';
-      document.getElementById('search-num-right').value = '';
     }
 
     function queueRenderPage(num) {
@@ -175,16 +225,23 @@
       } else {
         renderPage(num);
       }
+      pageNum = num;
     }
 
     function zoomIn() {
       currentScale += 0.1;
-      renderPage(pageNum);
+      queueRenderPage(pageNum);
     }
 
     function zoomOut() {
       currentScale = Math.max(0.5, currentScale - 0.1);
-      renderPage(pageNum);
+      queueRenderPage(pageNum);
+    }
+
+    function goToPage(page) {
+      if (page >= 1 && page <= pdfDoc.numPages) {
+        queueRenderPage(page);
+      }
     }
 
     function goToNextPage() {
@@ -201,12 +258,16 @@
       }
     }
 
-    // Suche links
     function searchByNumber() {
-      const input = document.getElementById('search-num').value;
+      // Wert von beiden Suchfeldern nehmen, falls links leer rechts prüfen
+      let inputLeft = document.getElementById('search-num-left').value;
+      let inputRight = document.getElementById('search-num-right').value;
+      let input = inputLeft || inputRight;
+
       const number = parseInt(input, 10);
       if (number >= 2001 && number <= 2700) {
-        const targetPage = number - 1998; // 2001 -> Seite 3
+        // Neue Offset-Berechnung: 2001 auf Seite 3
+        const targetPage = number - 1998;
         if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
           queueRenderPage(targetPage);
         } else {
@@ -217,27 +278,19 @@
       }
     }
 
-    // Suche rechts (für das rechte Suchfeld)
-    function searchByNumberRight() {
-      const input = document.getElementById('search-num-right').value;
-      const number = parseInt(input, 10);
-      if (number >= 2001 && number <= 2700) {
-        const targetPage = number - 1998; // 2001 -> Seite 3
-        if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
-          queueRenderPage(targetPage);
-        } else {
-          alert('Liednummer außerhalb des Bereichs!');
-        }
-      } else {
-        alert('Bitte eine gültige Liednummer zwischen 2001 und 2700 eingeben!');
-      }
-    }
+    document.getElementById('prev-bottom').addEventListener('click', () => {
+      goToPrevPage();
+    });
+
+    document.getElementById('next-bottom').addEventListener('click', () => {
+      goToNextPage();
+    });
 
     pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
       pdfDoc = pdfDoc_;
       renderPage(pageNum);
     }).catch(function(error) {
-      alert('Error al cargar el PDF: ' + error.message);
+      alert('Error loading PDF: ' + error.message);
       console.error(error);
     });
   </script>
