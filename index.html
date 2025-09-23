@@ -12,7 +12,7 @@
       justify-content: center; /* Zentriert die gesamte Seite */
       margin: 20px;
       height: 100vh; /* Stellt sicher, dass der Inhalt den gesamten Bildschirm ausfüllt */
-      align-items: center; /* Zentriert den Inhalt vertikal */
+      align-items: flex-start; /* Verhindert vertikale Zentrierung des gesamten Inhalts */
     }
 
     #container {
@@ -20,7 +20,6 @@
       justify-content: space-between;
       width: 100%;
       max-width: 1200px; /* Maximale Breite für den Container */
-      align-items: flex-start; /* Sicherstellen, dass alles oben ausgerichtet ist */
     }
 
     #menu {
@@ -35,7 +34,7 @@
     #pdf-container {
       flex-grow: 1;
       display: flex;
-      justify-content: center;
+      justify-content: center; /* Zentriert den PDF-Inhalt horizontal */
       align-items: center;
       position: relative;
       margin-left: 20px;
@@ -54,7 +53,8 @@
       padding: 10px 20px;
       position: absolute;
       bottom: 10px;
-      width: 100%;
+      right: 0; /* Stellt sicher, dass die Buttons rechts bleiben */
+      width: auto;
     }
 
     button, input[type=number] {
