@@ -93,6 +93,8 @@
       #menu {
         width: 100%; /* Das Menü nimmt die volle Breite ein */
         margin-bottom: 20px; /* Abstand zwischen Menü und PDF-Inhalt */
+        font-size: 14px; /* Kleinere Schrift im Menü */
+        padding: 5px; /* Weniger Abstand */
       }
 
       #pdf-container {
@@ -107,6 +109,11 @@
 
       .menu-button {
         padding: 10px; /* Etwas größere Buttons auf kleinen Bildschirmen */
+      }
+
+      /* Verstecke die Navigationsbuttons „Atrás“ und „Siguiente“ auf mobilen Geräten */
+      #navigation {
+        display: none; /* Die Buttons werden auf mobilen Geräten ausgeblendet */
       }
     }
 
@@ -261,4 +268,3 @@
   </script>
 </body>
 </html>
-
