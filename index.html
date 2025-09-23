@@ -17,21 +17,22 @@
 
     #container {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       width: 100%;
       max-width: 1200px;
+      gap: 20px; /* Abstand zwischen links-PDF-rechts */
+      position: relative;
     }
 
-    #menu, #menu-right {
+    #menu, #right-navigation {
       width: 250px;
       background-color: #f1f1f1;
       padding: 10px;
       border: 1px solid #ccc;
-      height: 100%;
+      height: auto;
       text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
     }
 
     #pdf-container {
@@ -39,8 +40,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      position: relative;
-      margin-left: 20px;
+      max-width: calc(100% - 540px); /* 250px + 20px + 250px + 20px */
     }
 
     canvas {
@@ -51,148 +51,39 @@
 
     button, input[type=number] {
       font-size: 16px;
-      margin: 0 5px;
-      padding: 5px 10px;
-    }
-
-    .menu-button {
-      display: inline-block;
       margin: 5px 0;
-      padding: 8px;
-      background-color: #008CBA;
-      color: white;
-      text-align: center;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
+      padding: 8px 10px;
       width: 100%;
       box-sizing: border-box;
-    }
-
-    .menu-button:hover {
-      background-color: #007B9A;
-    }
-
-    #menu h3, #menu-right h3 {
-      text-align: center;
-      margin-bottom: 15px;
-      width: 100%;
-    }
-
-    #menu h4, #menu-right h4 {
-      margin-top: 20px;
-      margin-bottom: 8px;
-      width: 100%;
-      text-align: left;
-      padding-left: 5px;
-    }
-
-    input[type=number]#search-num, input[type=number]#search-num-right {
-      width: 100%;
-      padding: 6px;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      background-color: white;
-      box-sizing: border-box;
-      margin-bottom: 8px;
-    }
-
-    /* Container für neue Navigation oben */
-    .nav-top-buttons {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      margin-bottom: 15px;
-      gap: 10px;
-    }
-
-    .nav-top-buttons button {
-      flex: 1;
-      padding: 8px 10px;
-      font-size: 16px;
       cursor: pointer;
       border: none;
       border-radius: 4px;
       background-color: #008CBA;
       color: white;
-      transition: background-color 0.3s ease;
     }
 
-    .nav-top-buttons button:hover {
+    button:hover {
       background-color: #007B9A;
     }
 
-    /* Container für Pfeil-Buttons unter Menü */
-    .nav-bottom-buttons {
-      margin-top: auto;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      width: 100%;
+    h3, h4 {
+      margin-bottom: 10px;
     }
 
-    .nav-bottom-buttons button {
-      width: 48%;
-      padding: 8px 10px;
-      font-size: 16px;
-      cursor: pointer;
-      border: none;
-      border-radius: 4px;
-      background-color: #008CBA;
-      color: white;
-      transition: background-color 0.3s ease;
-    }
-
-    .nav-bottom-buttons button:hover {
-      background-color: #007B9A;
-    }
-
-    /* Mobile responsiveness */
+    /* Verstecke das rechte Menü auf mobilen Geräten */
     @media (max-width: 768px) {
+      #right-navigation {
+        display: none;
+      }
       #container {
         flex-direction: column;
       }
-
-      #menu, #menu-right {
+      #menu, #pdf-container {
         width: 100%;
-        margin-bottom: 20px;
-        font-size: 14px;
-        padding: 5px;
+        max-width: none;
       }
-
       #pdf-container {
-        width: 100%;
-        margin-left: 0;
-      }
-
-      button, input[type=number] {
-        font-size: 14px;
-        padding: 5px;
-      }
-
-      .menu-button {
-        padding: 10px;
-        width: 100%; /* Buttons untereinander auf mobilen Geräten */
-      }
-
-      /* Rechtes Menü ausblenden */
-      #menu-right {
-        display: none;
-      }
-    }
-
-    @media (max-width: 480px) {
-      #menu, #menu-right {
-        width: 100%;
-      }
-
-      #pdf-container {
-        margin-left: 0;
-      }
-
-      .menu-button {
-        padding: 8px;
+        margin-top: 20px;
       }
     }
   </style>
@@ -202,27 +93,16 @@
     <!-- Linkes Menü -->
     <div id="menu">
       <h3>Índice</h3>
-
-      <div class="nav-top-buttons">
-        <button class="menu-button" onclick="goToPage(1)">Portada</button>
-        <button class="menu-button" onclick="goToPage(2)">Notas explicativas</button>
-      </div>
-
-      <button class="menu-button" onclick="goToPage(3)">Página siguiente</button>
-      <button class="menu-button" onclick="goToPrevPage()">Página anterior</button>
+      <button onclick="goToNextPage()">Página Siguiente</button>
+      <button onclick="goToPrevPage()">Página Anterior</button>
 
       <h4>Zoom</h4>
-      <button class="menu-button" onclick="zoomIn()">Ampliar</button>
-      <button class="menu-button" onclick="zoomOut()">Reducir</button>
+      <button onclick="zoomIn()">Ampliar</button>
+      <button onclick="zoomOut()">Reducir</button>
 
-      <h4>Cántico #</h4>
+      <h4>Buscar #</h4>
       <input type="number" id="search-num" min="2001" max="2700" placeholder="Número de Himno" />
-      <button class="menu-button" onclick="searchByNumber()">Buscar</button>
-
-      <div class="nav-bottom-buttons">
-        <button id="prev-left">&larr; Atrás</button>
-        <button id="next-left">Siguiente &rarr;</button>
-      </div>
+      <button onclick="searchByNumber()">Buscar</button>
     </div>
 
     <!-- PDF Container -->
@@ -230,30 +110,19 @@
       <canvas id="pdf-render"></canvas>
     </div>
 
-    <!-- Rechtes Menü -->
-    <div id="menu-right">
+    <!-- Rechtes Menü (Gleicher Inhalt wie links) -->
+    <div id="right-navigation">
       <h3>Índice</h3>
-
-      <div class="nav-top-buttons">
-        <button class="menu-button" onclick="goToPage(1)">Portada</button>
-        <button class="menu-button" onclick="goToPage(2)">Notas explicativas</button>
-      </div>
-
-      <button class="menu-button" onclick="goToPage(3)">Página siguiente</button>
-      <button class="menu-button" onclick="goToPrevPage()">Página anterior</button>
+      <button onclick="goToNextPage()">Página Siguiente</button>
+      <button onclick="goToPrevPage()">Página Anterior</button>
 
       <h4>Zoom</h4>
-      <button class="menu-button" onclick="zoomIn()">Ampliar</button>
-      <button class="menu-button" onclick="zoomOut()">Reducir</button>
+      <button onclick="zoomIn()">Ampliar</button>
+      <button onclick="zoomOut()">Reducir</button>
 
-      <h4>Cántico #</h4>
+      <h4>Buscar #</h4>
       <input type="number" id="search-num-right" min="2001" max="2700" placeholder="Número de Himno" />
-      <button class="menu-button" onclick="searchByNumberRight()">Buscar</button>
-
-      <div class="nav-bottom-buttons">
-        <button id="prev-right">&larr; Atrás</button>
-        <button id="next-right">Siguiente &rarr;</button>
-      </div>
+      <button onclick="searchByNumberRight()">Buscar</button>
     </div>
   </div>
 
@@ -261,9 +130,9 @@
     const url = 'meinedatei.pdf'; // Hier den PDF-Dateinamen eintragen
 
     let pdfDoc = null,
-      pageNum = 1,
-      pageRendering = false,
-      pageNumPending = null;
+        pageNum = 1,
+        pageRendering = false,
+        pageNumPending = null;
 
     let currentScale = 1.5;
 
@@ -294,7 +163,10 @@
         });
       });
 
-      document.getElementById('page-num')?.value = num;
+      pageNum = num;
+      // Update beide Suchfelder auf neue Seite, wenn gewünscht
+      document.getElementById('search-num').value = '';
+      document.getElementById('search-num-right').value = '';
     }
 
     function queueRenderPage(num) {
@@ -305,59 +177,14 @@
       }
     }
 
-    // Button Event-Listener Pfeile links
-    document.getElementById('prev-left').addEventListener('click', () => {
-      if (pageNum > 1) {
-        pageNum--;
-        queueRenderPage(pageNum);
-      }
-    });
-
-    document.getElementById('next-left').addEventListener('click', () => {
-      if (pageNum < pdfDoc.numPages) {
-        pageNum++;
-        queueRenderPage(pageNum);
-      }
-    });
-
-    // Button Event-Listener Pfeile rechts
-    document.getElementById('prev-right').addEventListener('click', () => {
-      if (pageNum > 1) {
-        pageNum--;
-        queueRenderPage(pageNum);
-      }
-    });
-
-    document.getElementById('next-right').addEventListener('click', () => {
-      if (pageNum < pdfDoc.numPages) {
-        pageNum++;
-        queueRenderPage(pageNum);
-      }
-    });
-
-    pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
-      pdfDoc = pdfDoc_;
-      renderPage(pageNum);
-    }).catch(function(error) {
-      alert('Error al cargar el PDF: ' + error.message);
-      console.error(error);
-    });
-
     function zoomIn() {
       currentScale += 0.1;
-      queueRenderPage(pageNum);
+      renderPage(pageNum);
     }
 
     function zoomOut() {
       currentScale = Math.max(0.5, currentScale - 0.1);
-      queueRenderPage(pageNum);
-    }
-
-    function goToPage(page) {
-      if (page >= 1 && page <= pdfDoc.numPages) {
-        pageNum = page;
-        queueRenderPage(pageNum);
-      }
+      renderPage(pageNum);
     }
 
     function goToNextPage() {
@@ -379,10 +206,9 @@
       const input = document.getElementById('search-num').value;
       const number = parseInt(input, 10);
       if (number >= 2001 && number <= 2700) {
-        const targetPage = number - 1998; // 2001 = Seite 3
+        const targetPage = number - 1998; // 2001 -> Seite 3
         if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
-          pageNum = targetPage;
-          queueRenderPage(pageNum);
+          queueRenderPage(targetPage);
         } else {
           alert('Liednummer außerhalb des Bereichs!');
         }
@@ -391,15 +217,14 @@
       }
     }
 
-    // Suche rechts (separat, falls notwendig)
+    // Suche rechts (für das rechte Suchfeld)
     function searchByNumberRight() {
       const input = document.getElementById('search-num-right').value;
       const number = parseInt(input, 10);
       if (number >= 2001 && number <= 2700) {
-        const targetPage = number - 1998; // 2001 = Seite 3
+        const targetPage = number - 1998; // 2001 -> Seite 3
         if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
-          pageNum = targetPage;
-          queueRenderPage(pageNum);
+          queueRenderPage(targetPage);
         } else {
           alert('Liednummer außerhalb des Bereichs!');
         }
@@ -407,6 +232,14 @@
         alert('Bitte eine gültige Liednummer zwischen 2001 und 2700 eingeben!');
       }
     }
+
+    pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+      pdfDoc = pdfDoc_;
+      renderPage(pageNum);
+    }).catch(function(error) {
+      alert('Error al cargar el PDF: ' + error.message);
+      console.error(error);
+    });
   </script>
 </body>
 </html>
