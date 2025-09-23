@@ -70,11 +70,14 @@
       margin-bottom: 10px;
     }
 
-    input[type=number]:focus {
-      background-color: white;
+    /* Nur Suchfelder: blauen Fokus-Hintergrund entfernen */
+    .search-input:focus {
       outline: none;
-      box-shadow: none;
-      color: black; /* texto visible */
+      box-shadow: none !important;
+      background-color: white;
+      color: black;
+      -webkit-appearance: none;
+      -moz-appearance: textfield;
     }
 
     /* Verstecke das rechte Menü auf mobilen Geräten */
@@ -107,8 +110,8 @@
       <button onclick="zoomIn()">Ampliar</button>
       <button onclick="zoomOut()">Reducir</button>
 
-      <h4>Buscar #</h4>
-      <input type="number" id="search-num" min="2001" max="2700" placeholder="Número de Himno" />
+      <h4>Cántico #</h4>
+      <input type="number" id="search-num" class="search-input" min="2001" max="2700" placeholder="Número de Himno" />
       <button onclick="searchByNumber()">Cántico #</button>
     </div>
 
@@ -127,8 +130,8 @@
       <button onclick="zoomIn()">Ampliar</button>
       <button onclick="zoomOut()">Reducir</button>
 
-      <h4>Buscar #</h4>
-      <input type="number" id="search-num-right" min="2001" max="2700" placeholder="Número de Himno" />
+      <h4>Cántico #</h4>
+      <input type="number" id="search-num-right" class="search-input" min="2001" max="2700" placeholder="Número de Himno" />
       <button onclick="searchByNumberRight()">Cántico #</button>
     </div>
   </div>
