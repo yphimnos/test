@@ -13,7 +13,6 @@
       margin: 20px;
       height: 100vh;
       align-items: flex-start;
-      position: relative;
     }
 
     #container {
@@ -21,11 +20,11 @@
       justify-content: center;
       width: 100%;
       max-width: 1200px;
+      gap: 20px; /* Abstand zwischen links-PDF-rechts */
       position: relative;
     }
 
-    /* Linkes Menü */
-    #menu {
+    #menu, #right-navigation {
       width: 250px;
       background-color: #f1f1f1;
       padding: 10px;
@@ -33,6 +32,7 @@
       height: auto;
       text-align: center;
       box-sizing: border-box;
+      font-family: Arial, sans-serif;
     }
 
     #pdf-container {
@@ -40,8 +40,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      position: relative;
-      margin: 0 20px;
+      max-width: calc(100% - 540px); /* 250px + 20px + 250px + 20px */
     }
 
     canvas {
@@ -50,101 +49,41 @@
       height: auto;
     }
 
-    /* Rechtes Menü */
-    #right-navigation {
-      width: 250px;
-      background-color: #f1f1f1;
-      padding: 10px;
-      border: 1px solid #ccc;
-      height: auto;
-      text-align: center;
-      font-family: Arial, sans-serif;
-
-      position: absolute;
-      top: 0;
-      /* Position: rechts neben #pdf-container */
-      left: calc(50% + 290px); /* 50% Container + 250px linkes Menü + 20px Margin links + 20px Margin rechts */
-      box-sizing: border-box;
-    }
-
-    /* Gemeinsames Styling für Überschriften */
-    #menu h3,
-    #menu h4,
-    #right-navigation h3,
-    #right-navigation h4 {
-      margin-bottom: 15px;
-      font-weight: bold;
+    button, input[type=number] {
       font-size: 16px;
-      color: #000;
-    }
-
-    /* Buttons Styling */
-    .menu-button {
-      display: block;
-      width: 100%;
       margin: 5px 0;
-      padding: 8px;
-      background-color: #008CBA;
-      color: white;
-      font-size: 16px;
+      padding: 8px 10px;
+      width: 100%;
+      box-sizing: border-box;
+      cursor: pointer;
       border: none;
       border-radius: 4px;
-      cursor: pointer;
-      box-sizing: border-box;
-      text-align: center;
+      background-color: #008CBA;
+      color: white;
     }
 
-    .menu-button:hover {
+    button:hover {
       background-color: #007B9A;
     }
 
-    /* Input Styling */
-    input[type=number] {
-      width: 100%;
-      padding: 6px 8px;
-      margin: 8px 0 15px 0;
-      font-size: 14px;
-      box-sizing: border-box;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+    h3, h4 {
+      margin-bottom: 10px;
     }
 
-    /* Mobile Responsiveness */
+    /* Verstecke das rechte Menü auf mobilen Geräten */
     @media (max-width: 768px) {
-      #container {
-        flex-direction: column;
-        align-items: center;
-      }
-
-      #menu {
-        width: 100%;
-        margin-bottom: 20px;
-        font-size: 14px;
-        padding: 5px;
-      }
-
-      #pdf-container {
-        width: 100%;
-        margin: 0;
-      }
-
       #right-navigation {
         display: none;
       }
-
-      button.menu-button, input[type=number] {
-        font-size: 14px;
-        padding: 5px;
+      #container {
+        flex-direction: column;
       }
-    }
-
-    @media (max-width: 480px) {
-      #menu {
+      #menu, #pdf-container {
         width: 100%;
+        max-width: none;
       }
-
-      button.menu-button {
-        padding: 8px;
+      #pdf-container {
+        margin-top: 20px;
       }
     }
   </style>
@@ -154,36 +93,36 @@
     <!-- Linkes Menü -->
     <div id="menu">
       <h3>Índice</h3>
-      <button class="menu-button" onclick="goToNextPage()">Página Siguiente</button>
-      <button class="menu-button" onclick="goToPrevPage()">Página Anterior</button>
+      <button onclick="goToNextPage()">Página Siguiente</button>
+      <button onclick="goToPrevPage()">Página Anterior</button>
 
       <h4>Zoom</h4>
-      <button class="menu-button" onclick="zoomIn()">Ampliar</button>
-      <button class="menu-button" onclick="zoomOut()">Reducir</button>
+      <button onclick="zoomIn()">Ampliar</button>
+      <button onclick="zoomOut()">Reducir</button>
 
       <h4>Buscar #</h4>
       <input type="number" id="search-num" min="2001" max="2700" placeholder="Número de Himno" />
-      <button class="menu-button" onclick="searchByNumber()">Buscar</button>
+      <button onclick="searchByNumber()">Buscar</button>
     </div>
 
-    <!-- PDF Bereich -->
+    <!-- PDF Container -->
     <div id="pdf-container">
       <canvas id="pdf-render"></canvas>
     </div>
 
-    <!-- Rechtes Menü (gleiches wie links, außer IDs für Suche angepasst) -->
+    <!-- Rechtes Menü (Gleicher Inhalt wie links) -->
     <div id="right-navigation">
       <h3>Índice</h3>
-      <button class="menu-button" onclick="goToNextPage()">Página Siguiente</button>
-      <button class="menu-button" onclick="goToPrevPage()">Página Anterior</button>
+      <button onclick="goToNextPage()">Página Siguiente</button>
+      <button onclick="goToPrevPage()">Página Anterior</button>
 
       <h4>Zoom</h4>
-      <button class="menu-button" onclick="zoomIn()">Ampliar</button>
-      <button class="menu-button" onclick="zoomOut()">Reducir</button>
+      <button onclick="zoomIn()">Ampliar</button>
+      <button onclick="zoomOut()">Reducir</button>
 
       <h4>Buscar #</h4>
       <input type="number" id="search-num-right" min="2001" max="2700" placeholder="Número de Himno" />
-      <button class="menu-button" onclick="searchByNumberRight()">Buscar</button>
+      <button onclick="searchByNumberRight()">Buscar</button>
     </div>
   </div>
 
@@ -224,7 +163,10 @@
         });
       });
 
-      document.getElementById('page-num').value = num;
+      pageNum = num;
+      // Update beide Suchfelder auf neue Seite, wenn gewünscht
+      document.getElementById('search-num').value = '';
+      document.getElementById('search-num-right').value = '';
     }
 
     function queueRenderPage(num) {
@@ -245,11 +187,6 @@
       renderPage(pageNum);
     }
 
-    function goToPage(page) {
-      pageNum = page;
-      queueRenderPage(pageNum);
-    }
-
     function goToNextPage() {
       if (pageNum < pdfDoc.numPages) {
         pageNum++;
@@ -264,15 +201,14 @@
       }
     }
 
-    // Suche Funktion linkes Menü
+    // Suche links
     function searchByNumber() {
       const input = document.getElementById('search-num').value;
       const number = parseInt(input, 10);
       if (number >= 2001 && number <= 2700) {
-        const targetPage = number - 1998; // Erste Liednummer 2001 = Seite 3
+        const targetPage = number - 1998; // 2001 -> Seite 3
         if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
-          pageNum = targetPage;
-          queueRenderPage(pageNum);
+          queueRenderPage(targetPage);
         } else {
           alert('Liednummer außerhalb des Bereichs!');
         }
@@ -281,15 +217,14 @@
       }
     }
 
-    // Suche Funktion rechtes Menü (andere Input-ID)
+    // Suche rechts (für das rechte Suchfeld)
     function searchByNumberRight() {
       const input = document.getElementById('search-num-right').value;
       const number = parseInt(input, 10);
       if (number >= 2001 && number <= 2700) {
-        const targetPage = number - 1998; // Erste Liednummer 2001 = Seite 3
+        const targetPage = number - 1998; // 2001 -> Seite 3
         if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
-          pageNum = targetPage;
-          queueRenderPage(pageNum);
+          queueRenderPage(targetPage);
         } else {
           alert('Liednummer außerhalb des Bereichs!');
         }
