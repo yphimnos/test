@@ -107,7 +107,7 @@
       box-sizing: border-box;
       font-family: Arial, sans-serif;
     }
-    #right-navigation button, #right-navigation input[type=number] {
+    #right-navigation button, #right-navigation input[type=text] {
       font-size: 16px;
       margin: 5px 0;
       padding: 8px 10px;
@@ -122,12 +122,14 @@
     #right-navigation button:hover {
       background-color: #007B9A;
     }
-    #right-navigation input[type=number] {
+    #right-navigation input[type=text] {
       background-color: white;
       color: black;
       border: 1px solid #ccc;
+      text-align: left;
+      padding-left: 10px;
     }
-    #right-navigation input[type=number]:focus {
+    #right-navigation input[type=text]:focus {
       outline: none;
       box-shadow: 0 0 0 2px #008CBA;
       background-color: white;
@@ -234,9 +236,9 @@
       <button onclick="zoomIn()">Ampliar</button>
       <button onclick="zoomOut()">Reducir</button>
 
-      <h4>Cántico #</h4>
-      <input type="number" id="search-num-right" min="2001" max="2700" placeholder="Número de Himno" />
-      <button onclick="searchByNumberRight()">Buscar</button>
+      <h4>Buscar frase</h4>
+      <input type="text" id="search-text-right" placeholder="Buscar palabra o frase" />
+      <button onclick="searchTextRight()">Buscar</button>
     </div>
   </div>
 
@@ -281,7 +283,7 @@
       pageNum = num;
       // Suchfelder zurücksetzen
       document.getElementById('search-num').value = '';
-      document.getElementById('search-num-right').value = '';
+      document.getElementById('search-text-right').value = '';
     }
 
     function queueRenderPage(num) {
@@ -327,7 +329,7 @@
       queueRenderPage(2);
     }
 
-    // Suchfunktion links
+    // Suchfunktion links (numerisch)
     function searchByNumber() {
       const input = document.getElementById('search-num').value;
       const number = parseInt(input, 10);
@@ -336,27 +338,54 @@
         if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
           queueRenderPage(targetPage);
         } else {
-          alert('Liednummer außerhalb des Bereichs!');
+          alert('¡Número fuera del rango permitido!');
         }
       } else {
-        alert('Bitte eine gültige Liednummer zwischen 2001 und 2700 eingeben!');
+        alert('¡Por favor, ingrese un número válido entre 2001 y 2700!');
       }
     }
 
-    // Suchfunktion rechts
-    function searchByNumberRight() {
-      const input = document.getElementById('search-num-right').value;
-      const number = parseInt(input, 10);
-      if (number >= 2001 && number <= 2700) {
-        const targetPage = number - 1998; // 2001 -> Seite 3
-        if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
-          queueRenderPage(targetPage);
-        } else {
-          alert('Liednummer außerhalb des Bereichs!');
-        }
-      } else {
-        alert('Bitte eine gültige Liednummer zwischen 2001 und 2700 eingeben!');
+    // Suchfunktion rechts (Textsuche, einfache Variante)
+    function searchTextRight() {
+      const query = document.getElementById('search-text-right').value.trim();
+      if (!query) {
+        alert('Por favor, ingrese una palabra o frase para buscar.');
+        return;
       }
+
+      let found = false;
+
+      // Suche in allen Seiten
+      const searchPromises = [];
+      for (let i = 1; i <= pdfDoc.numPages; i++) {
+        searchPromises.push(
+          pdfDoc.getPage(i).then(page => {
+            return page.getTextContent().then(textContent => {
+              const textItems = textContent.items;
+              const pageText = textItems.map(item => item.str).join(' ');
+              if (pageText.toLowerCase().includes(query.toLowerCase())) {
+                found = true;
+                queueRenderPage(i);
+                throw 'found'; // Abbruch aller weiteren Suchen
+              }
+            });
+          })
+        );
+      }
+
+      Promise.all(searchPromises)
+        .then(() => {
+          if (!found) {
+            alert(`No se encontró la frase "${query}" en el documento.`);
+          }
+        })
+        .catch(e => {
+          if (e !== 'found') {
+            console.error(e);
+            alert('Error durante la búsqueda: ' + e);
+          }
+          // Wenn 'found' wird nichts weiter gemacht, da Seite gerendert
+        });
     }
 
     // PDF laden und initial anzeigen
