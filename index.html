@@ -35,17 +35,14 @@
       font-family: Arial, sans-serif;
     }
 
-    /* Einheitliche Überschriften-Größe */
-    #menu h3, #menu h4, #right-navigation h3, #right-navigation h4 {
+    /* Linkes Menü - Überschriften zentriert */
+    #menu h3, #menu h4 {
       text-align: center;
       margin-bottom: 10px;
-      font-size: 18px;
-      font-weight: bold;
     }
 
     /* Buttons & Inputs zentriert */
-    #menu button, #menu input[type=number], 
-    #right-navigation button, #right-navigation input[type=text] {
+    #menu button, #menu input[type=number] {
       text-align: center;
       font-size: 16px;
       margin: 5px 0;
@@ -60,19 +57,19 @@
     }
 
     /* Ausnahme Suchfeld mit weißem Hintergrund und ohne blauen Fokus */
-    #menu input[type=number], #right-navigation input[type=text] {
+    #menu input[type=number] {
       background-color: white;
       color: black;
       border: 1px solid #ccc;
     }
-    #menu input[type=number]:focus, #right-navigation input[type=text]:focus {
+    #menu input[type=number]:focus {
       outline: none;
       box-shadow: 0 0 0 2px #008CBA;
       background-color: white;
       color: black;
     }
 
-    #menu button:hover, #right-navigation button:hover {
+    #menu button:hover {
       background-color: #007B9A;
     }
 
@@ -97,6 +94,44 @@
       border: 1px solid #ccc;
       max-width: 100%;
       height: auto;
+    }
+
+    /* Rechtes Menü identisch mit links (außer Suchfeld) */
+    #right-navigation {
+      width: 250px;
+      background-color: #f1f1f1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      height: auto;
+      text-align: center;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+    #right-navigation button, #right-navigation input[type=text] {
+      font-size: 16px;
+      margin: 5px 0;
+      padding: 8px 10px;
+      width: 100%;
+      box-sizing: border-box;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background-color: #008CBA;
+      color: white;
+    }
+    #right-navigation button:hover {
+      background-color: #007B9A;
+    }
+    #right-navigation input[type=text] {
+      background-color: white;
+      color: black;
+      border: 1px solid #ccc;
+    }
+    #right-navigation input[type=text]:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #008CBA;
+      background-color: white;
+      color: black;
     }
 
     /* Pfeil-Button Styles */
@@ -151,23 +186,15 @@
         flex-direction: column;
         gap: 10px;
       }
-      /* Obere Gruppe: Navegar a + Portada + Notas + Navegar a (Buttons) */
+      /* Obere Gruppe: Portada + Notas + Página anterior + Página siguiente */
       .menu-top-mobile {
         display: flex;
         flex-direction: column;
         gap: 8px;
       }
-      /* Rest (Cántico, Zoom) nach unten */
+      /* Rest (Nro. de cántico) nach unten */
       .menu-bottom {
         order: 3;
-      }
-      /* Buttons „Portada“ und „Notas“ auch unten anzeigen */
-      .menu-special-buttons-mobile {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        margin-top: 15px;
-        text-align: center;
       }
     }
   </style>
@@ -179,43 +206,33 @@
     <div id="menu">
       <!-- Mobile: obere Gruppe -->
       <div class="menu-top-mobile">
-        <!-- Überschrift "Índice" entfernt, stattdessen "Navegar a:" -->
+        <!-- Überschrift "Navegar a:" -->
         <h3>Navegar a:</h3>
         <div class="menu-special-buttons">
           <button onclick="goToPortada()">Portada</button>
           <button onclick="goToNotas()">Notas explicativas</button>
         </div>
 
-        <!-- Buttons mit Pfeilen links -->
-        <button class="arrow-btn right" onclick="goToNextPage()">
-          Página Siguiente
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M8 5l8 7-8 7V5z"/>
-          </svg>
-        </button>
+        <!-- Buttons mit Pfeilen in der Reihenfolge: Página anterior, Página siguiente -->
         <button class="arrow-btn left" onclick="goToPrevPage()">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M8 5l8 7-8 7V5z"/>
           </svg>
           Página Anterior
         </button>
+        <button class="arrow-btn right" onclick="goToNextPage()">
+          Página Siguiente
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M8 5l8 7-8 7V5z"/>
+          </svg>
+        </button>
       </div>
 
       <!-- Mobile: untere Gruppe -->
       <div class="menu-bottom">
-        <h4>Cántico #</h4>
+        <h4>Nro. de cántico:</h4>
         <input type="number" id="search-num" min="2001" max="2700" placeholder="Número de Himno" />
         <button onclick="searchByNumber()">Buscar</button>
-
-        <h4>Zoom</h4>
-        <button onclick="zoomIn()">Ampliar</button>
-        <button onclick="zoomOut()">Reducir</button>
-
-        <!-- Mobile: zusätzliche Buttons unten anzeigen -->
-        <div class="menu-special-buttons-mobile" style="display:none;">
-          <button onclick="goToPortada()">Portada</button>
-          <button onclick="goToNotas()">Notas explicativas</button>
-        </div>
       </div>
     </div>
 
@@ -226,26 +243,21 @@
 
     <!-- Rechtes Menü -->
     <div id="right-navigation">
-      <!-- Überschrift "Índice" geändert in "Navegar a" -->
-      <h3>Navegar a</h3>
-      <button class="arrow-btn right" onclick="goToNextPage()">
-        Página Siguiente
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M8 5l8 7-8 7V5z"/>
-        </svg>
-      </button>
+      <h3>Navegar a:</h3>
       <button class="arrow-btn left" onclick="goToPrevPage()">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path d="M8 5l8 7-8 7V5z"/>
         </svg>
         Página Anterior
       </button>
+      <button class="arrow-btn right" onclick="goToNextPage()">
+        Página Siguiente
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M8 5l8 7-8 7V5z"/>
+        </svg>
+      </button>
 
-      <h4>Zoom</h4>
-      <button onclick="zoomIn()">Ampliar</button>
-      <button onclick="zoomOut()">Reducir</button>
-
-      <h4>Buscar frase</h4>
+      <h4>Buscar frase:</h4>
       <input type="text" id="search-text-right" placeholder="Buscar palabra o frase" />
       <button onclick="searchTextRight()">Buscar</button>
     </div>
@@ -302,17 +314,6 @@
       } else {
         renderPage(num);
       }
-    }
-
-    // Zoom Funktionen
-    function zoomIn() {
-      currentScale += 0.1;
-      renderPage(pageNum);
-    }
-
-    function zoomOut() {
-      currentScale = Math.max(0.5, currentScale - 0.1);
-      renderPage(pageNum);
     }
 
     // Navigation
@@ -388,18 +389,6 @@
     pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
       pdfDoc = pdfDoc_;
       renderPage(pageNum);
-
-      // Mobile: Zusätzliche Buttons unten sichtbar machen
-      function checkMobile() {
-        const specialBtnsMobile = document.querySelector('.menu-special-buttons-mobile');
-        if (window.innerWidth <= 768) {
-          specialBtnsMobile.style.display = 'flex';
-        } else {
-          specialBtnsMobile.style.display = 'none';
-        }
-      }
-      checkMobile();
-      window.addEventListener('resize', checkMobile);
     });
   </script>
 </body>
