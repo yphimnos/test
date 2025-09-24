@@ -19,7 +19,7 @@
       display: flex;
       justify-content: center;
       width: 100%;
-      max-width: 1200px;
+      max-width: 1400px; /* Vergrößerte Breite des Containers */
       gap: 20px;
       position: relative;
     }
@@ -93,7 +93,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      max-width: calc(100% - 540px);
+      max-width: 100%;
     }
 
     canvas {
@@ -201,13 +201,12 @@
       /* Rest (Nro. de cántico) nach unten */
       .menu-bottom {
         order: 1; /* Nro. de cántico wird zuerst angezeigt */
-        margin-bottom: 2px; /* Reduzierter Abstand */
       }
 
       /* Sorgt dafür, dass "Buscar frase" nach "Nro. de cántico" kommt */
       .menu-search-text-mobile {
         order: 2; /* "Buscar frase" wird nach "Nro. de cántico" angezeigt */
-        margin-top: 2px; /* Reduzierter Abstand */
+        margin-top: 5px; /* Abstand verringert */
       }
     }
 
