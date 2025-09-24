@@ -35,11 +35,13 @@
       font-family: Arial, sans-serif;
     }
 
+    /* Linkes Menü - Überschriften zentriert */
     #menu h3, #menu h4 {
       text-align: center;
       margin-bottom: 10px;
     }
 
+    /* Buttons & Inputs zentriert */
     #menu button, #menu input[type=number] {
       text-align: center;
       font-size: 16px;
@@ -54,12 +56,12 @@
       color: white;
     }
 
+    /* Ausnahme Suchfeld mit weißem Hintergrund und ohne blauen Fokus */
     #menu input[type=number] {
       background-color: white;
       color: black;
       border: 1px solid #ccc;
     }
-
     #menu input[type=number]:focus {
       outline: none;
       box-shadow: 0 0 0 2px #008CBA;
@@ -71,6 +73,7 @@
       background-color: #007B9A;
     }
 
+    /* Spezielle Container für Buttons in Index */
     .menu-special-buttons {
       margin-bottom: 15px;
       display: flex;
@@ -93,6 +96,7 @@
       height: auto;
     }
 
+    /* Rechtes Menü identisch mit links (außer Suchfeld) */
     #right-navigation {
       width: 250px;
       background-color: #f1f1f1;
@@ -130,11 +134,12 @@
       color: black;
     }
 
+    /* Pfeil-Button Styles */
     button.arrow-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 8px; /* Abstand zwischen Pfeil und Text */
       background-color: #008CBA;
       color: white;
       border: none;
@@ -156,46 +161,81 @@
       transform: rotate(180deg);
     }
 
+    /* Mobile Styles */
     @media (max-width: 768px) {
       #right-navigation {
         display: none;
       }
-
       #container {
         flex-direction: column;
       }
-
+      #menu, #pdf-container {
+        width: 100%;
+        max-width: none;
+      }
       #pdf-container {
-        order: 1;
         margin-top: 10px;
+        order: 2; /* PDF Inhalt direkt nach obere Menüpunkte */
         display: flex;
         justify-content: center;
         align-items: center;
       }
-
       #menu {
-        order: 2;
-        width: 100%;
+        /* Flex Layout für Mobile links */
         display: flex;
         flex-direction: column;
         gap: 10px;
       }
-
+      /* Obere Gruppe: Portada + Notas + Página anterior + Página siguiente */
       .menu-top-mobile {
         display: flex;
         flex-direction: column;
         gap: 8px;
       }
-
+      /* Rest (Nro. de cántico) nach unten */
       .menu-bottom {
         order: 3;
       }
+    }
 
-      /* Neue Suchfunktion im linken Menü (nur für mobile Ansicht) */
-      .menu-search-text-mobile {
-        display: block;
-        margin-top: 20px;
-      }
+    /* Neue Stile für die linke Menü-Suchfunktion (Buscar frase) */
+    #menu .menu-search-text-mobile {
+      margin-top: 20px;
+      text-align: center; /* Zentriert die Elemente */
+    }
+
+    #menu .menu-search-text-mobile h4 {
+      font-size: 16px; /* Gleiche Schriftgröße wie auf der rechten Seite */
+      color: black;
+      margin-bottom: 10px; /* Etwas Abstand nach unten */
+    }
+
+    #menu .menu-search-text-mobile input[type=text] {
+      font-size: 16px; /* Gleiche Schriftgröße wie auf der rechten Seite */
+      margin-bottom: 10px; /* Abstand zum Button */
+      padding: 8px 10px;
+      width: 100%;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+    }
+
+    #menu .menu-search-text-mobile input[type=text]::placeholder {
+      color: #aaa; /* Farbe des Platzhalters */
+    }
+
+    #menu .menu-search-text-mobile button {
+      font-size: 16px; /* Gleiche Schriftgröße wie auf der rechten Seite */
+      padding: 8px 10px;
+      width: 100%;
+      background-color: #008CBA;
+      color: white;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+    }
+
+    #menu .menu-search-text-mobile button:hover {
+      background-color: #007B9A;
     }
   </style>
 </head>
@@ -204,12 +244,15 @@
 
     <!-- Linkes Menü -->
     <div id="menu">
+      <!-- Mobile: obere Gruppe -->
       <div class="menu-top-mobile">
         <h3>Navegar a:</h3>
         <div class="menu-special-buttons">
           <button onclick="goToPortada()">Portada</button>
           <button onclick="goToNotas()">Notas explicativas</button>
         </div>
+
+        <!-- Buttons mit Pfeilen in der Reihenfolge: Página anterior, Página siguiente -->
         <button class="arrow-btn left" onclick="goToPrevPage()">
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <path d="M8 5l8 7-8 7V5z"/>
@@ -224,13 +267,14 @@
         </button>
       </div>
 
+      <!-- Mobile: untere Gruppe -->
       <div class="menu-bottom">
         <h4>Nro. de cántico:</h4>
         <input type="number" id="search-num" min="2001" max="2700" placeholder="Nro. de cántico" />
         <button onclick="searchByNumber()">Buscar</button>
       </div>
 
-      <!-- Neue Suchfunktion "Buscar frase" im linken Menü für Mobile -->
+      <!-- Neue Suchfunktion "Buscar frase" im linken Menü -->
       <div class="menu-search-text-mobile">
         <h4>Buscar frase:</h4>
         <input type="text" id="search-text-left" placeholder="Buscar palabra o frase" />
@@ -243,7 +287,7 @@
       <canvas id="pdf-render"></canvas>
     </div>
 
-    <!-- Rechtes Menü (bleibt versteckt in der mobilen Version) -->
+    <!-- Rechtes Menü -->
     <div id="right-navigation">
       <h3>Navegar a:</h3>
       <button class="arrow-btn left" onclick="goToPrevPage()">
@@ -278,6 +322,7 @@
     const canvas = document.getElementById('pdf-render');
     const ctx = canvas.getContext('2d');
 
+    // PDF Seiten rendern
     function renderPage(num) {
       pageRendering = true;
 
@@ -303,6 +348,7 @@
       });
 
       pageNum = num;
+      // Suchfelder zurücksetzen
       document.getElementById('search-num').value = '';
       const searchRight = document.getElementById('search-text-right');
       if(searchRight) searchRight.value = '';
@@ -316,6 +362,7 @@
       }
     }
 
+    // Navigation
     function goToNextPage() {
       if (pageNum < pdfDoc.numPages) {
         pageNum++;
@@ -330,6 +377,7 @@
       }
     }
 
+    // Neue Buttons: Portada (Seite 1) und Notas explicativas (Seite 2)
     function goToPortada() {
       queueRenderPage(1);
     }
@@ -338,6 +386,7 @@
       queueRenderPage(2);
     }
 
+    // Suchfunktion links (nummernbasiert)
     function searchByNumber() {
       const input = document.getElementById('search-num').value;
       const number = parseInt(input, 10);
@@ -349,14 +398,15 @@
           alert('¡Número fuera de rango!');
         }
       } else {
-        alert('Por favor, introduzca un número válido entre 2001 y 2700.');
+        alert('número válido entre 2001 y 2700');
       }
     }
 
+    // Suchfunktion rechts (Textsuche im PDF mit Highlighting)
     async function searchTextRight() {
       const query = document.getElementById('search-text-right').value.trim().toLowerCase();
       if (!query) {
-        alert('Por favor, introduzca una palabra o frase para buscar.');
+        alert('palabra o frase para buscar');
         return;
       }
 
@@ -381,10 +431,11 @@
       }
     }
 
+    // Suchfunktion links (Textsuche im PDF mit Highlighting)
     async function searchTextLeft() {
       const query = document.getElementById('search-text-left').value.trim().toLowerCase();
       if (!query) {
-        alert('Por favor, introduzca una palabra o frase para buscar.');
+        alert('palabra o frase para buscar.');
         return;
       }
 
@@ -409,6 +460,7 @@
       }
     }
 
+    // PDF laden und initial anzeigen
     pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
       pdfDoc = pdfDoc_;
       renderPage(pageNum);
