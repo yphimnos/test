@@ -194,7 +194,13 @@
       }
       /* Rest (Nro. de cántico) nach unten */
       .menu-bottom {
-        order: 3;
+        order: 1; /* Nro. de cántico wird zuerst angezeigt */
+      }
+
+      /* Sorgt dafür, dass "Buscar frase" nach "Nro. de cántico" kommt */
+      .menu-search-text-mobile {
+        order: 2; /* "Buscar frase" wird nach "Nro. de cántico" angezeigt */
+        margin-top: 20px;
       }
     }
 
@@ -398,7 +404,7 @@
           alert('¡Número fuera de rango!');
         }
       } else {
-        alert('número válido entre 2001 y 2700');
+        alert('Por favor, introduzca un número válido entre 2001 y 2700.');
       }
     }
 
@@ -406,7 +412,7 @@
     async function searchTextRight() {
       const query = document.getElementById('search-text-right').value.trim().toLowerCase();
       if (!query) {
-        alert('palabra o frase para buscar');
+        alert('Por favor, introduzca una palabra o frase para buscar.');
         return;
       }
 
@@ -435,7 +441,7 @@
     async function searchTextLeft() {
       const query = document.getElementById('search-text-left').value.trim().toLowerCase();
       if (!query) {
-        alert('palabra o frase para buscar.');
+        alert('Por favor, introduzca una palabra o frase para buscar.');
         return;
       }
 
