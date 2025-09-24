@@ -204,6 +204,13 @@
       }
     }
 
+    /* Desktop Styles (größer als 768px) */
+    @media (min-width: 769px) {
+      #menu .menu-search-text-mobile {
+        display: none; /* "Buscar frase" wird auf Desktop ausgeblendet */
+      }
+    }
+
     /* Neue Stile für die linke Menü-Suchfunktion (Buscar frase) */
     #menu .menu-search-text-mobile {
       margin-top: 20px;
@@ -276,7 +283,7 @@
       <!-- Mobile: untere Gruppe -->
       <div class="menu-bottom">
         <h4>Nro. de cántico:</h4>
-        <input type="number" id="search-num" min="2001" max="2700" placeholder="Nro. de cántico" />
+        <input type="number" id="search-num" min="2001" max="2700" placeholder="Nro. himno a buscar" />
         <button onclick="searchByNumber()">Buscar</button>
       </div>
 
@@ -404,7 +411,7 @@
           alert('¡Número fuera de rango!');
         }
       } else {
-        alert('Por favor, introduzca un número válido entre 2001 y 2700.');
+        alert('Número válido entre 2001 y 2700.');
       }
     }
 
@@ -412,7 +419,7 @@
     async function searchTextRight() {
       const query = document.getElementById('search-text-right').value.trim().toLowerCase();
       if (!query) {
-        alert('Por favor, introduzca una palabra o frase para buscar.');
+        alert('Palabra o frase a buscar');
         return;
       }
 
@@ -441,7 +448,7 @@
     async function searchTextLeft() {
       const query = document.getElementById('search-text-left').value.trim().toLowerCase();
       if (!query) {
-        alert('Por favor, introduzca una palabra o frase para buscar.');
+        alert('Palabra o frase a buscar');
         return;
       }
 
