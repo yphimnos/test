@@ -36,6 +36,7 @@
     }
 
     /* Linkes Menü - Überschriften zentriert */
+    /* Hier Überschrift „Índice“ entfernt, „Navegar a“ an anderer Stelle */
     #menu h3, #menu h4 {
       text-align: center;
       margin-bottom: 10px;
@@ -96,7 +97,7 @@
       height: auto;
     }
 
-    /* Rechtes Menü identisch mit links (außer Suchfeld) */
+    /* Rechtes Menü */
     #right-navigation {
       width: 250px;
       background-color: #f1f1f1;
@@ -107,7 +108,7 @@
       box-sizing: border-box;
       font-family: Arial, sans-serif;
     }
-    #right-navigation button {
+    #right-navigation button, #right-navigation input[type=text] {
       font-size: 16px;
       margin: 5px 0;
       padding: 8px 10px;
@@ -118,10 +119,6 @@
       border-radius: 4px;
       background-color: #008CBA;
       color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
     }
     #right-navigation button:hover {
       background-color: #007B9A;
@@ -130,12 +127,6 @@
       background-color: white;
       color: black;
       border: 1px solid #ccc;
-      padding: 8px 10px;
-      font-size: 16px;
-      border-radius: 4px;
-      box-sizing: border-box;
-      width: 100%;
-      margin: 5px 0 10px 0;
     }
     #right-navigation input[type=text]:focus {
       outline: none;
@@ -144,34 +135,30 @@
       color: black;
     }
 
-    /* Pfeil-Text Buttons links */
-    #menu button.arrow-btn {
-      background-color: #008CBA;
-      border-radius: 8px;
-      padding: 8px 10px;
-      font-weight: bold;
-      font-size: 14px;
-      color: white;
+    /* Pfeil-Buttons mit Text */
+    .btn-arrow {
+      position: relative;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      cursor: pointer;
+      gap: 5px;
+      font-weight: bold;
       user-select: none;
     }
-    #menu button.arrow-btn:hover {
-      background-color: #007B9A;
-    }
-    /* Pfeile als Unicode */
-    .arrow-left::before {
-      content: "⬅";
-      font-size: 18px;
+    .btn-arrow::before {
+      content: '';
       display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      padding: 3px;
     }
-    .arrow-right::after {
-      content: "➡";
-      font-size: 18px;
-      display: inline-block;
+    .btn-arrow.prev::before {
+      transform: rotate(135deg);
+    }
+    .btn-arrow.next::before {
+      transform: rotate(-45deg);
     }
 
     /* Mobile Styles */
@@ -199,7 +186,7 @@
         flex-direction: column;
         gap: 10px;
       }
-      /* Obere Gruppe: Navegar a + Portada + Notas + Navegar a */
+      /* Obere Gruppe: Índice + Portada + Notas + Navegar a */
       .menu-top-mobile {
         display: flex;
         flex-direction: column;
@@ -228,14 +215,15 @@
       <!-- Mobile: obere Gruppe -->
       <div class="menu-top-mobile">
         <!-- Überschrift "Índice" entfernt -->
+        <h3>Navegar a:</h3>
         <div class="menu-special-buttons">
           <button onclick="goToPortada()">Portada</button>
           <button onclick="goToNotas()">Notas explicativas</button>
         </div>
 
-        <h3>Navegar a:</h3>
-        <button class="arrow-btn arrow-right" onclick="goToNextPage()">Página Siguiente</button>
-        <button class="arrow-btn arrow-left" onclick="goToPrevPage()">Página Anterior</button>
+        <!-- Die Navigationsbuttons mit Pfeilen und Text -->
+        <button class="btn-arrow next" onclick="goToNextPage()">Página siguiente</button>
+        <button class="btn-arrow prev" onclick="goToPrevPage()">Página atrás</button>
       </div>
 
       <!-- PDF Inhalt wird hier in mobile Reihenfolge unter Navigation angezeigt -->
@@ -267,21 +255,18 @@
     <!-- Rechtes Menü -->
     <div id="right-navigation">
       <h3>Índice</h3>
-      <button onclick="goToNextPage()">Página Siguiente</button>
-      <button onclick="goToPrevPage()">Página Anterior</button>
+      <button class="btn-arrow next" onclick="goToNextPage()">Página siguiente</button>
+      <button class="btn-arrow prev" onclick="goToPrevPage()">Página atrás</button>
 
       <h4>Zoom</h4>
       <button onclick="zoomIn()">Ampliar</button>
       <button onclick="zoomOut()">Reducir</button>
 
       <h4>Buscar frase</h4>
-      <input
-        type="text"
-        id="search-text-right"
-        placeholder="Buscar palabra o frase"
-        autocomplete="off"
-      />
-      <button onclick="searchByTextRight()">Buscar</button>
+      <input type="text" id="search-text-right" placeholder="Buscar palabra o frase" />
+      <button onclick="searchTextRight()">Buscar</button>
+
+      <p id="search-message" style="color: red; margin-top: 10px;"></p>
     </div>
   </div>
 
@@ -324,9 +309,10 @@
       });
 
       pageNum = num;
-      // Suchfelder zurücksetzen
+      clearSearchMessages();
+      // Suchfelder zurücksetzen bei Seitenwechsel nur bei Nummer links
       document.getElementById('search-num').value = '';
-      document.getElementById('search-text-right').value = '';
+      // Rechts Suchfeld bleibt (um leichter neue Suche zu machen)
     }
 
     function queueRenderPage(num) {
@@ -372,7 +358,7 @@
       queueRenderPage(2);
     }
 
-    // Suchfunktion links (Nach Nummer suchen)
+    // Suchfunktion links (nummernbasiert)
     function searchByNumber() {
       const input = document.getElementById('search-num').value;
       const number = parseInt(input, 10);
@@ -388,16 +374,35 @@
       }
     }
 
-    // Suchfunktion rechts (Suchtext) - Dummy Implementation
-    function searchByTextRight() {
-      const query = document.getElementById('search-text-right').value.trim();
-      if (query.length === 0) {
-        alert('Por favor, ingrese una palabra o frase para buscar.');
+    // Suchfunktion rechts (Textsuche über alle Seiten)
+    async function searchTextRight() {
+      clearSearchMessages();
+      const query = document.getElementById('search-text-right').value.trim().toLowerCase();
+      const messageElem = document.getElementById('search-message');
+
+      if (!query) {
+        messageElem.textContent = "Por favor, ingrese una palabra o frase válida.";
         return;
       }
-      // Da komplexe Textsuche im PDF hier nicht umgesetzt wird,
-      // einfach Meldung ausgeben
-      alert('Búsqueda de texto para: "' + query + '" (implementación pendiente)');
+
+      // Suche in allen Seiten
+      for (let i = 1; i <= pdfDoc.numPages; i++) {
+        const page = await pdfDoc.getPage(i);
+        const content = await page.getTextContent();
+        const strings = content.items.map(item => item.str.toLowerCase());
+        const pageText = strings.join(' ');
+        if (pageText.includes(query)) {
+          queueRenderPage(i);
+          return; // Erster Treffer -> Seite anzeigen
+        }
+      }
+
+      // Kein Treffer
+      messageElem.textContent = "No se encontraron resultados para la búsqueda.";
+    }
+
+    function clearSearchMessages() {
+      document.getElementById('search-message').textContent = '';
     }
 
     // PDF laden und initial anzeigen
