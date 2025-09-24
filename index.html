@@ -39,6 +39,12 @@
     #menu h3, #menu h4 {
       text-align: center;
       margin-bottom: 10px;
+      font-size: 16px; /* Schriftgröße für "Navegar a:" */
+    }
+
+    /* Gleiche Schriftgröße für die "Navegar a:" und "Buscar frase:" Überschriften */
+    #menu h3, #right-navigation h3 {
+      font-size: 16px; /* Gleiche Schriftgröße für beide */
     }
 
     /* Buttons & Inputs zentriert */
@@ -181,7 +187,6 @@
         align-items: center;
       }
       #menu {
-        /* Flex Layout für Mobile links */
         display: flex;
         flex-direction: column;
         gap: 10px;
