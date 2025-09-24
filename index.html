@@ -107,7 +107,7 @@
       box-sizing: border-box;
       font-family: Arial, sans-serif;
     }
-    #right-navigation button, #right-navigation input[type=text] {
+    #right-navigation button, #right-navigation input[type=number] {
       font-size: 16px;
       margin: 5px 0;
       padding: 8px 10px;
@@ -122,18 +122,67 @@
     #right-navigation button:hover {
       background-color: #007B9A;
     }
-    #right-navigation input[type=text] {
+    #right-navigation input[type=number] {
       background-color: white;
       color: black;
       border: 1px solid #ccc;
-      text-align: left;
-      padding-left: 10px;
     }
-    #right-navigation input[type=text]:focus {
+    #right-navigation input[type=number]:focus {
       outline: none;
       box-shadow: 0 0 0 2px #008CBA;
       background-color: white;
       color: black;
+    }
+
+    /* Pfeil-Buttons für linke Navigation */
+    button.arrow-left {
+      position: relative;
+      padding-left: 30px; /* Platz für Pfeil links */
+      background-color: #008CBA;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      text-align: left;
+    }
+
+    button.arrow-left::before {
+      content: "";
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0; 
+      height: 0; 
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-right: 12px solid white; /* Pfeilspitze */
+    }
+
+    button.arrow-right {
+      position: relative;
+      padding-right: 30px; /* Platz für Pfeil rechts */
+      background-color: #008CBA;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      text-align: left;
+    }
+
+    button.arrow-right::after {
+      content: "";
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0; 
+      height: 0; 
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 12px solid white; /* Pfeilspitze */
     }
 
     /* Mobile Styles */
@@ -189,19 +238,19 @@
     <div id="menu">
       <!-- Mobile: obere Gruppe -->
       <div class="menu-top-mobile">
-        <h3>Índice</h3>
+        <!-- Überschrift "Índice" entfernt -->
+
         <div class="menu-special-buttons">
           <button onclick="goToPortada()">Portada</button>
           <button onclick="goToNotas()">Notas explicativas</button>
         </div>
 
-        <h3>Navegar a:</h3>
-        <button onclick="goToNextPage()">Página Siguiente</button>
-        <button onclick="goToPrevPage()">Página Anterior</button>
-      </div>
+        <h3>Navegar a:</h3> <!-- Überschrift "Índice" durch "Navegar a" ersetzt -->
 
-      <!-- PDF Inhalt wird hier in mobile Reihenfolge unter Navigation angezeigt -->
-      <!-- (nur der PDF Container, nicht hier im Menü) -->
+        <!-- Navigation mit Pfeil-Buttons -->
+        <button class="arrow-right" onclick="goToNextPage()">Página Siguiente</button>
+        <button class="arrow-left" onclick="goToPrevPage()">Página Anterior</button>
+      </div>
 
       <!-- Mobile: untere Gruppe -->
       <div class="menu-bottom">
@@ -213,7 +262,6 @@
         <button onclick="zoomIn()">Ampliar</button>
         <button onclick="zoomOut()">Reducir</button>
 
-        <!-- Mobile: zusätzliche Buttons unten anzeigen -->
         <div class="menu-special-buttons-mobile" style="display:none;">
           <button onclick="goToPortada()">Portada</button>
           <button onclick="goToNotas()">Notas explicativas</button>
@@ -236,9 +284,9 @@
       <button onclick="zoomIn()">Ampliar</button>
       <button onclick="zoomOut()">Reducir</button>
 
-      <h4>Buscar frase</h4>
-      <input type="text" id="search-text-right" placeholder="Buscar palabra o frase" />
-      <button onclick="searchTextRight()">Buscar</button>
+      <h4>Cántico #</h4>
+      <input type="number" id="search-num-right" min="2001" max="2700" placeholder="Número de Himno" />
+      <button onclick="searchByNumberRight()">Buscar</button>
     </div>
   </div>
 
@@ -283,7 +331,7 @@
       pageNum = num;
       // Suchfelder zurücksetzen
       document.getElementById('search-num').value = '';
-      document.getElementById('search-text-right').value = '';
+      document.getElementById('search-num-right').value = '';
     }
 
     function queueRenderPage(num) {
@@ -329,7 +377,7 @@
       queueRenderPage(2);
     }
 
-    // Suchfunktion links (numerisch)
+    // Suchfunktion links
     function searchByNumber() {
       const input = document.getElementById('search-num').value;
       const number = parseInt(input, 10);
@@ -338,54 +386,27 @@
         if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
           queueRenderPage(targetPage);
         } else {
-          alert('¡Número fuera del rango permitido!');
+          alert('Liednummer außerhalb des Bereichs!');
         }
       } else {
-        alert('¡Por favor, ingrese un número válido entre 2001 y 2700!');
+        alert('Bitte eine gültige Liednummer zwischen 2001 und 2700 eingeben!');
       }
     }
 
-    // Suchfunktion rechts (Textsuche, einfache Variante)
-    function searchTextRight() {
-      const query = document.getElementById('search-text-right').value.trim();
-      if (!query) {
-        alert('Por favor, ingrese una palabra o frase para buscar.');
-        return;
+    // Suchfunktion rechts
+    function searchByNumberRight() {
+      const input = document.getElementById('search-num-right').value;
+      const number = parseInt(input, 10);
+      if (number >= 2001 && number <= 2700) {
+        const targetPage = number - 1998; // 2001 -> Seite 3
+        if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
+          queueRenderPage(targetPage);
+        } else {
+          alert('Liednummer außerhalb des Bereichs!');
+        }
+      } else {
+        alert('Bitte eine gültige Liednummer zwischen 2001 und 2700 eingeben!');
       }
-
-      let found = false;
-
-      // Suche in allen Seiten
-      const searchPromises = [];
-      for (let i = 1; i <= pdfDoc.numPages; i++) {
-        searchPromises.push(
-          pdfDoc.getPage(i).then(page => {
-            return page.getTextContent().then(textContent => {
-              const textItems = textContent.items;
-              const pageText = textItems.map(item => item.str).join(' ');
-              if (pageText.toLowerCase().includes(query.toLowerCase())) {
-                found = true;
-                queueRenderPage(i);
-                throw 'found'; // Abbruch aller weiteren Suchen
-              }
-            });
-          })
-        );
-      }
-
-      Promise.all(searchPromises)
-        .then(() => {
-          if (!found) {
-            alert(`No se encontró la frase "${query}" en el documento.`);
-          }
-        })
-        .catch(e => {
-          if (e !== 'found') {
-            console.error(e);
-            alert('Error durante la búsqueda: ' + e);
-          }
-          // Wenn 'found' wird nichts weiter gemacht, da Seite gerendert
-        });
     }
 
     // PDF laden und initial anzeigen
@@ -405,8 +426,8 @@
       checkMobile();
       window.addEventListener('resize', checkMobile);
     }).catch(function(error) {
-      alert('Error al cargar el PDF: ' + error.message);
-      console.error(error);
+      console.error('Error loading PDF: ' + error.message);
+      alert('Fehler beim Laden der PDF-Datei!');
     });
   </script>
 </body>
