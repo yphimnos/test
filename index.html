@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Visor de PDF con Menú Interactivo</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
@@ -36,7 +36,6 @@
     }
 
     /* Linkes Menü - Überschriften zentriert */
-    /* Hier Überschrift „Índice“ entfernt, „Navegar a“ an anderer Stelle */
     #menu h3, #menu h4 {
       text-align: center;
       margin-bottom: 10px;
@@ -97,7 +96,7 @@
       height: auto;
     }
 
-    /* Rechtes Menü */
+    /* Rechtes Menü identisch mit links (außer Suchfeld) */
     #right-navigation {
       width: 250px;
       background-color: #f1f1f1;
@@ -135,30 +134,31 @@
       color: black;
     }
 
-    /* Pfeil-Buttons mit Text */
-    .btn-arrow {
-      position: relative;
+    /* Pfeil-Button Styles */
+    button.arrow-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
-      font-weight: bold;
-      user-select: none;
+      gap: 8px; /* Abstand zwischen Pfeil und Text */
+      background-color: #008CBA;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      box-sizing: border-box;
     }
-    .btn-arrow::before {
-      content: '';
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: solid white;
-      border-width: 0 3px 3px 0;
-      padding: 3px;
+
+    button.arrow-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: white;
     }
-    .btn-arrow.prev::before {
-      transform: rotate(135deg);
-    }
-    .btn-arrow.next::before {
-      transform: rotate(-45deg);
+
+    button.arrow-btn.left svg {
+      transform: rotate(180deg);
     }
 
     /* Mobile Styles */
@@ -214,20 +214,27 @@
     <div id="menu">
       <!-- Mobile: obere Gruppe -->
       <div class="menu-top-mobile">
-        <!-- Überschrift "Índice" entfernt -->
+        <!-- Überschrift "Índice" entfernt, stattdessen "Navegar a:" -->
         <h3>Navegar a:</h3>
         <div class="menu-special-buttons">
           <button onclick="goToPortada()">Portada</button>
           <button onclick="goToNotas()">Notas explicativas</button>
         </div>
 
-        <!-- Die Navigationsbuttons mit Pfeilen und Text -->
-        <button class="btn-arrow next" onclick="goToNextPage()">Página siguiente</button>
-        <button class="btn-arrow prev" onclick="goToPrevPage()">Página atrás</button>
+        <!-- Buttons mit Pfeilen links -->
+        <button class="arrow-btn right" onclick="goToNextPage()">
+          Página Siguiente
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M8 5l8 7-8 7V5z"/>
+          </svg>
+        </button>
+        <button class="arrow-btn left" onclick="goToPrevPage()">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M8 5l8 7-8 7V5z"/>
+          </svg>
+          Página Anterior
+        </button>
       </div>
-
-      <!-- PDF Inhalt wird hier in mobile Reihenfolge unter Navigation angezeigt -->
-      <!-- (nur der PDF Container, nicht hier im Menü) -->
 
       <!-- Mobile: untere Gruppe -->
       <div class="menu-bottom">
@@ -254,9 +261,20 @@
 
     <!-- Rechtes Menü -->
     <div id="right-navigation">
+      <!-- Überschrift "Índice" bleibt hier -->
       <h3>Índice</h3>
-      <button class="btn-arrow next" onclick="goToNextPage()">Página siguiente</button>
-      <button class="btn-arrow prev" onclick="goToPrevPage()">Página atrás</button>
+      <button class="arrow-btn right" onclick="goToNextPage()">
+        Página Siguiente
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M8 5l8 7-8 7V5z"/>
+        </svg>
+      </button>
+      <button class="arrow-btn left" onclick="goToPrevPage()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M8 5l8 7-8 7V5z"/>
+        </svg>
+        Página Anterior
+      </button>
 
       <h4>Zoom</h4>
       <button onclick="zoomIn()">Ampliar</button>
@@ -265,8 +283,6 @@
       <h4>Buscar frase</h4>
       <input type="text" id="search-text-right" placeholder="Buscar palabra o frase" />
       <button onclick="searchTextRight()">Buscar</button>
-
-      <p id="search-message" style="color: red; margin-top: 10px;"></p>
     </div>
   </div>
 
@@ -309,10 +325,10 @@
       });
 
       pageNum = num;
-      clearSearchMessages();
-      // Suchfelder zurücksetzen bei Seitenwechsel nur bei Nummer links
+      // Suchfelder zurücksetzen
       document.getElementById('search-num').value = '';
-      // Rechts Suchfeld bleibt (um leichter neue Suche zu machen)
+      const searchRight = document.getElementById('search-text-right');
+      if(searchRight) searchRight.value = '';
     }
 
     function queueRenderPage(num) {
@@ -367,42 +383,40 @@
         if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
           queueRenderPage(targetPage);
         } else {
-          alert('Liednummer außerhalb des Bereichs!');
+          alert('¡Número fuera de rango!');
         }
       } else {
-        alert('Bitte eine gültige Liednummer zwischen 2001 und 2700 eingeben!');
+        alert('Por favor, introduzca un número válido entre 2001 y 2700.');
       }
     }
 
-    // Suchfunktion rechts (Textsuche über alle Seiten)
+    // Suchfunktion rechts (Textsuche im PDF mit Highlighting)
     async function searchTextRight() {
-      clearSearchMessages();
       const query = document.getElementById('search-text-right').value.trim().toLowerCase();
-      const messageElem = document.getElementById('search-message');
-
       if (!query) {
-        messageElem.textContent = "Por favor, ingrese una palabra o frase válida.";
+        alert('Por favor, introduzca una palabra o frase para buscar.');
         return;
       }
 
-      // Suche in allen Seiten
+      let foundPage = -1;
+
       for (let i = 1; i <= pdfDoc.numPages; i++) {
         const page = await pdfDoc.getPage(i);
-        const content = await page.getTextContent();
-        const strings = content.items.map(item => item.str.toLowerCase());
-        const pageText = strings.join(' ');
+        const textContent = await page.getTextContent();
+        const textItems = textContent.items.map(item => item.str.toLowerCase());
+        const pageText = textItems.join(' ');
+
         if (pageText.includes(query)) {
-          queueRenderPage(i);
-          return; // Erster Treffer -> Seite anzeigen
+          foundPage = i;
+          break;
         }
       }
 
-      // Kein Treffer
-      messageElem.textContent = "No se encontraron resultados para la búsqueda.";
-    }
-
-    function clearSearchMessages() {
-      document.getElementById('search-message').textContent = '';
+      if (foundPage > 0) {
+        queueRenderPage(foundPage);
+      } else {
+        alert('No se encontró la palabra o frase.');
+      }
     }
 
     // PDF laden und initial anzeigen
@@ -421,9 +435,6 @@
       }
       checkMobile();
       window.addEventListener('resize', checkMobile);
-    }).catch(function(error) {
-      alert('Error al cargar el PDF: ' + error.message);
-      console.error(error);
     });
   </script>
 </body>
