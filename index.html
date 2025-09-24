@@ -35,14 +35,17 @@
       font-family: Arial, sans-serif;
     }
 
-    /* Linkes Menü - Überschriften zentriert */
-    #menu h3, #menu h4 {
+    /* Einheitliche Überschriften-Größe */
+    #menu h3, #menu h4, #right-navigation h3, #right-navigation h4 {
       text-align: center;
       margin-bottom: 10px;
+      font-size: 18px;
+      font-weight: bold;
     }
 
     /* Buttons & Inputs zentriert */
-    #menu button, #menu input[type=number] {
+    #menu button, #menu input[type=number], 
+    #right-navigation button, #right-navigation input[type=text] {
       text-align: center;
       font-size: 16px;
       margin: 5px 0;
@@ -57,19 +60,19 @@
     }
 
     /* Ausnahme Suchfeld mit weißem Hintergrund und ohne blauen Fokus */
-    #menu input[type=number] {
+    #menu input[type=number], #right-navigation input[type=text] {
       background-color: white;
       color: black;
       border: 1px solid #ccc;
     }
-    #menu input[type=number]:focus {
+    #menu input[type=number]:focus, #right-navigation input[type=text]:focus {
       outline: none;
       box-shadow: 0 0 0 2px #008CBA;
       background-color: white;
       color: black;
     }
 
-    #menu button:hover {
+    #menu button:hover, #right-navigation button:hover {
       background-color: #007B9A;
     }
 
@@ -94,44 +97,6 @@
       border: 1px solid #ccc;
       max-width: 100%;
       height: auto;
-    }
-
-    /* Rechtes Menü identisch mit links (außer Suchfeld) */
-    #right-navigation {
-      width: 250px;
-      background-color: #f1f1f1;
-      padding: 10px;
-      border: 1px solid #ccc;
-      height: auto;
-      text-align: center;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
-    #right-navigation button, #right-navigation input[type=text] {
-      font-size: 16px;
-      margin: 5px 0;
-      padding: 8px 10px;
-      width: 100%;
-      box-sizing: border-box;
-      cursor: pointer;
-      border: none;
-      border-radius: 4px;
-      background-color: #008CBA;
-      color: white;
-    }
-    #right-navigation button:hover {
-      background-color: #007B9A;
-    }
-    #right-navigation input[type=text] {
-      background-color: white;
-      color: black;
-      border: 1px solid #ccc;
-    }
-    #right-navigation input[type=text]:focus {
-      outline: none;
-      box-shadow: 0 0 0 2px #008CBA;
-      background-color: white;
-      color: black;
     }
 
     /* Pfeil-Button Styles */
@@ -186,7 +151,7 @@
         flex-direction: column;
         gap: 10px;
       }
-      /* Obere Gruppe: Índice + Portada + Notas + Navegar a */
+      /* Obere Gruppe: Navegar a + Portada + Notas + Navegar a (Buttons) */
       .menu-top-mobile {
         display: flex;
         flex-direction: column;
@@ -261,8 +226,8 @@
 
     <!-- Rechtes Menü -->
     <div id="right-navigation">
-      <!-- Überschrift "Índice" bleibt hier -->
-      <h3>Índice</h3>
+      <!-- Überschrift "Índice" geändert in "Navegar a" -->
+      <h3>Navegar a</h3>
       <button class="arrow-btn right" onclick="goToNextPage()">
         Página Siguiente
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
