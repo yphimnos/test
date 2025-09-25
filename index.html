@@ -142,6 +142,7 @@
       #pdf-container {
         max-height: none;
         border-radius: 6px 6px 0 0;
+        height: 70vh; /* Altura visible para móvil */
       }
 
       #mobile-buttons {
@@ -198,15 +199,22 @@
 
     const canvas = document.getElementById('pdf-render');
     const ctx = canvas.getContext('2d');
-    let currentScale = 1.5;
 
     function renderPage(num) {
       pageRendering = true;
 
       pdfDoc.getPage(num).then(function(page) {
-        const viewport = page.getViewport({ scale: currentScale });
+        const container = document.getElementById('pdf-container');
+        const containerWidth = container.clientWidth;
+        const viewportUnscaled = page.getViewport({ scale: 1 });
+        const scale = containerWidth / viewportUnscaled.width;
+
+        const viewport = page.getViewport({ scale });
         canvas.height = viewport.height;
         canvas.width = viewport.width;
+
+        // Limpiar canvas antes de renderizar
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         const renderContext = {
           canvasContext: ctx,
