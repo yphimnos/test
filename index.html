@@ -86,6 +86,13 @@
       box-shadow: 0 0 0 2px #008CBA;
     }
 
+    .menu-special-buttons {
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
     .arrow-btn {
       display: inline-flex;
       align-items: center;
@@ -127,6 +134,7 @@
       height: auto;
     }
 
+    /* Mobile + Tablet Layout (bis 1024px) */
     @media (max-width: 1024px) {
       #container {
         flex-direction: column;
@@ -170,12 +178,14 @@
       }
     }
 
+    /* Desktop Layout (ab 1025px) */
     @media (min-width: 1025px) {
       #menu .menu-search-text-mobile {
         display: none;
       }
     }
 
+    /* Mobile-spezifische Suchbox */
     #menu .menu-search-text-mobile {
       margin-top: 20px;
       text-align: center;
@@ -188,39 +198,38 @@
 
     #menu .menu-search-text-mobile input[type=text]::placeholder {
       color: #aaa;
-      text-align: center; /* Zentriert den Placeholder-Text */
+      text-align: center; /* Placeholder zentriert */
+    }
+
+    /* NEU: Alle placeholder-Texte zentrieren */
+    input::placeholder {
+      text-align: center;
     }
   </style>
 </head>
 <body>
   <div id="container">
+    <!-- Linkes Menü -->
     <div id="menu">
       <div class="menu-top-mobile">
-        <h3>Mostrar menú:</h3>
-        <button id="accordion-btn" class="arrow-btn" aria-expanded="false">
-          <span>Mostrar menú</span>
+        <h3>Navegar a:</h3>
+        <div class="menu-special-buttons">
+          <button onclick="goToPortada()">Portada</button>
+          <button onclick="goToNotas()">Notas explicativas</button>
+        </div>
+
+        <button class="arrow-btn left" onclick="goToPrevPage()">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 5l8 7-8 7V5z"/>
+          </svg>
+          Página Anterior
+        </button>
+        <button class="arrow-btn right" onclick="goToNextPage()">
+          Página Siguiente
           <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path d="M8 5l8 7-8 7V5z"/>
           </svg>
         </button>
-        <div id="menu-content" style="display: none;">
-          <div class="menu-special-buttons">
-            <button onclick="goToPortada()">Portada</button>
-            <button onclick="goToNotas()">Notas explicativas</button>
-          </div>
-          <button class="arrow-btn left" onclick="goToPrevPage()">
-            Página Anterior
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 5l8 7-8 7V5z"/>
-            </svg>
-          </button>
-          <button class="arrow-btn right" onclick="goToNextPage()">
-            Página Siguiente
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 5l8 7-8 7V5z"/>
-            </svg>
-          </button>
-        </div>
       </div>
 
       <div class="menu-bottom">
@@ -236,17 +245,19 @@
       </div>
     </div>
 
+    <!-- PDF Container -->
     <div id="pdf-container">
       <canvas id="pdf-render"></canvas>
     </div>
 
+    <!-- Rechtes Menü (nur Desktop) -->
     <div id="right-navigation">
       <h3>Navegar a:</h3>
       <button class="arrow-btn left" onclick="goToPrevPage()">
-        Página Anterior
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M8 5l8 7-8 7V5z"/>
         </svg>
+        Página Anterior
       </button>
       <button class="arrow-btn right" onclick="goToNextPage()">
         Página Siguiente
@@ -262,7 +273,8 @@
   </div>
 
   <script>
-    const url = 'meinedatei.pdf'; 
+    const url = 'meinedatei.pdf'; // Hier den Dateinamen eintragen
+
     let pdfDoc = null,
         pageNum = 1,
         pageRendering = false,
@@ -284,8 +296,7 @@
           canvasContext: ctx,
           viewport: viewport
         };
-
-        page.render(renderContext).promise.then(function() {
+        page.render(renderContext).promise.then(() => {
           pageRendering = false;
           if (pageNumPending !== null) {
             renderPage(pageNumPending);
@@ -293,74 +304,83 @@
           }
         });
       });
+
+      pageNum = num;
+      document.getElementById('search-num').value = '';
+      const searchRight = document.getElementById('search-text-right');
+      if (searchRight) searchRight.value = '';
     }
 
-    function goToPrevPage() {
-      if (pageNum <= 1) return;
-      pageNum--;
-      renderPage(pageNum);
+    function queueRenderPage(num) {
+      if (pageRendering) {
+        pageNumPending = num;
+      } else {
+        renderPage(num);
+      }
     }
 
     function goToNextPage() {
-      if (pageNum >= pdfDoc.numPages) return;
-      pageNum++;
-      renderPage(pageNum);
+      if (pageNum < pdfDoc.numPages) {
+        pageNum++;
+        queueRenderPage(pageNum);
+      }
+    }
+
+    function goToPrevPage() {
+      if (pageNum > 1) {
+        pageNum--;
+        queueRenderPage(pageNum);
+      }
     }
 
     function goToPortada() {
-      pageNum = 1;
-      renderPage(pageNum);
+      queueRenderPage(1);
     }
 
     function goToNotas() {
-      pageNum = 20; // Beispiel: Gehe zur Seite 20
-      renderPage(pageNum);
+      queueRenderPage(2);
     }
 
     function searchByNumber() {
-      const number = parseInt(document.getElementById('search-num').value);
+      const input = document.getElementById('search-num').value;
+      const number = parseInt(input, 10);
       if (number >= 2001 && number <= 2700) {
-        pageNum = number;
-        renderPage(pageNum);
+        const targetPage = number - 1998;
+        if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
+          queueRenderPage(targetPage);
+        } else {
+          alert('¡Número fuera de rango!');
+        }
+      } else {
+        alert('Número válido entre 2001 y 2700.');
       }
     }
 
-    function searchTextLeft() {
-      const text = document.getElementById('search-text-left').value.toLowerCase();
-      findText(text);
-    }
-
-    function searchTextRight() {
-      const text = document.getElementById('search-text-right').value.toLowerCase();
-      findText(text);
-    }
-
-    function findText(text) {
-      if (!text) return;
-      let found = false;
+    async function searchText(query) {
       for (let i = 1; i <= pdfDoc.numPages; i++) {
-        pdfDoc.getPage(i).then(function(page) {
-          page.getTextContent().then(function(textContent) {
-            const textItems = textContent.items;
-            for (let j = 0; j < textItems.length; j++) {
-              if (textItems[j].str.toLowerCase().includes(text)) {
-                found = true;
-                pageNum = i;
-                renderPage(pageNum);
-                break;
-              }
-            }
-          });
-        });
+        const page = await pdfDoc.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str.toLowerCase()).join(' ');
+        if (pageText.includes(query)) {
+          return i;
+        }
       }
+      return -1;
     }
 
-    document.getElementById('accordion-btn').addEventListener('click', function() {
-      const menuContent = document.getElementById('menu-content');
-      const expanded = this.getAttribute('aria-expanded') === 'true';
-      menuContent.style.display = expanded ? 'none' : 'block';
-      this.setAttribute('aria-expanded', !expanded);
-    });
+    async function searchTextRight() {
+      const query = document.getElementById('search-text-right').value.trim().toLowerCase();
+      if (!query) return alert('Palabra o frase a buscar');
+      const foundPage = await searchText(query);
+      foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
+    }
+
+    async function searchTextLeft() {
+      const query = document.getElementById('search-text-left').value.trim().toLowerCase();
+      if (!query) return alert('Palabra o frase a buscar');
+      const foundPage = await searchText(query);
+      foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
+    }
 
     pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
       pdfDoc = pdfDoc_;
