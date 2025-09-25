@@ -77,6 +77,8 @@
       background-color: white;
       color: black;
       border: 1px solid #ccc;
+      /* Zentrierung der Placeholder-Texte */
+      text-align: center;
     }
 
     #menu input:focus,
@@ -146,35 +148,41 @@
         max-width: none;
       }
 
-      #menu {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        order: 2;
-      }
-
-      #pdf-container {
-        order: 1;
-        margin-top: 10px;
-      }
-
       #right-navigation {
         display: none;
       }
 
-      .menu-top-mobile {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+      /* Accordion Toggle Button */
+      #accordion-toggle {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: #008CBA;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        cursor: pointer;
+        box-sizing: border-box;
       }
 
-      .menu-bottom {
-        order: 1;
+      /* Accordion Content mit smooth toggle */
+      #accordion-content {
+        overflow: hidden;
+        max-height: 1000px; /* groß genug für alle Inhalte */
+        transition: max-height 0.4s ease;
       }
 
-      .menu-search-text-mobile {
-        order: 2;
-        margin-top: 5px;
+      #accordion-content.collapsed {
+        max-height: 0;
+      }
+
+      /* Menüinhalt im Accordion */
+      #menu > .menu-top-mobile,
+      #menu > .menu-bottom,
+      #menu > .menu-search-text-mobile {
+        padding: 0 10px 10px;
       }
     }
 
@@ -183,60 +191,25 @@
       #menu .menu-search-text-mobile {
         display: none;
       }
-    }
-
-    /* Mobile-spezifische Suchbox */
-    #menu .menu-search-text-mobile {
-      margin-top: 20px;
-      text-align: center;
-    }
-
-    #menu .menu-search-text-mobile h4 {
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-
-    #menu .menu-search-text-mobile input[type=text]::placeholder {
-      color: #aaa;
-    }
-
-    /* Accordion Styles */
-    #accordion-toggle {
-      display: none;
-      width: 100%;
-      padding: 10px;
-      font-size: 18px;
-      background-color: #008CBA;
-      color: white;
-      border: none;
-      cursor: pointer;
-      border-radius: 4px;
-      text-align: center;
-      box-sizing: border-box;
-      margin-bottom: 10px;
-    }
-
-    #accordion-content {
-      display: block;
-    }
-
-    @media (max-width: 1024px) {
       #accordion-toggle {
-        display: block;
-      }
-
-      #accordion-content.collapsed {
         display: none;
+      }
+      #accordion-content {
+        max-height: none !important;
+        overflow: visible !important;
+        transition: none !important;
       }
     }
   </style>
 </head>
 <body>
   <div id="container">
-    <!-- Linkes Menü mit Accordion -->
+    <!-- Linkes Menü -->
     <div id="menu">
-      <button id="accordion-toggle" aria-expanded="false">Mostrar menú ▼</button>
-      
+      <!-- Accordion Toggle Button für Mobile -->
+      <button id="accordion-toggle" aria-expanded="true">Ocultar menú ▲</button>
+
+      <!-- Accordion Content -->
       <div id="accordion-content">
         <div class="menu-top-mobile">
           <h3>Navegar a:</h3>
@@ -312,6 +285,9 @@
     const ctx = canvas.getContext('2d');
     let currentScale = 1.5;
 
+    // Cache aller Seiten-Texte für schnelle Suche
+    let textCache = [];
+
     function renderPage(num) {
       pageRendering = true;
 
@@ -334,9 +310,7 @@
       });
 
       pageNum = num;
-      document.getElementById('search-num').value = '';
-      const searchRight = document.getElementById('search-text-right');
-      if (searchRight) searchRight.value = '';
+      // Optional: Eingabefelder bleiben erhalten
     }
 
     function queueRenderPage(num) {
@@ -384,33 +358,31 @@
       }
     }
 
-    async function searchText(query) {
-      for (let i = 1; i <= pdfDoc.numPages; i++) {
-        const page = await pdfDoc.getPage(i);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items.map(item => item.str.toLowerCase()).join(' ');
-        if (pageText.includes(query)) {
-          return i;
+    function searchText(query) {
+      query = query.toLowerCase();
+      for (let i = 0; i < textCache.length; i++) {
+        if (textCache[i].includes(query)) {
+          return i + 1; // Seiten sind 1-basiert
         }
       }
       return -1;
     }
 
-    async function searchTextRight() {
+    function searchTextRight() {
       const query = document.getElementById('search-text-right').value.trim().toLowerCase();
       if (!query) return alert('Palabra o frase a buscar');
-      const foundPage = await searchText(query);
+      const foundPage = searchText(query);
       foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
     }
 
-    async function searchTextLeft() {
+    function searchTextLeft() {
       const query = document.getElementById('search-text-left').value.trim().toLowerCase();
       if (!query) return alert('Palabra o frase a buscar');
-      const foundPage = await searchText(query);
+      const foundPage = searchText(query);
       foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
     }
 
-    // Accordion Toggle
+    // Accordion Toggle mit smooth animation
     document.addEventListener('DOMContentLoaded', () => {
       const toggleBtn = document.getElementById('accordion-toggle');
       const accordionContent = document.getElementById('accordion-content');
@@ -429,12 +401,24 @@
       });
     });
 
-    // PDF laden und erste Seite rendern
+    // PDF laden + Text aller Seiten cachen
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-    pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+    pdfjsLib.getDocument(url).promise.then(async function(pdfDoc_) {
       pdfDoc = pdfDoc_;
+      // Text aller Seiten parallel laden & cachen
+      const promises = [];
+      for (let i = 1; i <= pdfDoc.numPages; i++) {
+        promises.push(pdfDoc.getPage(i).then(page => 
+          page.getTextContent().then(tc => 
+            tc.items.map(item => item.str.toLowerCase()).join(' ')
+          )
+        ));
+      }
+      textCache = await Promise.all(promises);
       renderPage(pageNum);
+    }).catch(err => {
+      alert('Error al cargar el PDF: ' + err.message);
     });
   </script>
 </body>
