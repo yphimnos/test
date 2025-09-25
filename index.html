@@ -3,283 +3,193 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Visor de PDF con Menú Interactivo</title>
+  <title>Visor de PDF con Menú Limpio</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
-    body {
+    body, html {
+      margin: 0; padding: 0; height: 100%;
       font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      margin: 0;
-      padding: 20px;
-      min-height: 100vh;
-      box-sizing: border-box;
       background-color: #f9f9f9;
     }
 
     #container {
       display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      width: 100%;
-      max-width: 1400px;
+      height: 100vh; /* altura total ventana */
       gap: 20px;
+      box-sizing: border-box;
+      padding: 20px;
     }
 
-    #menu {
-      flex: 1 1 250px;
-      min-width: 200px;
-      max-width: 300px;
+    /* Panel izquierdo con botones */
+    #left-panel {
+      width: 280px;
       background-color: #f1f1f1;
-      padding: 10px;
+      padding: 15px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
       border: 1px solid #ccc;
-      text-align: center;
+      border-radius: 6px;
+    }
+
+    #left-panel button, 
+    #left-panel input[type=number],
+    #left-panel input[type=text] {
+      font-size: 16px;
+      padding: 10px 12px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
       box-sizing: border-box;
-    }
-
-    #menu h3, #menu h4,
-    #right-navigation h3, #right-navigation h4 {
-      font-size: 16px;
-      text-align: center;
-      margin-bottom: 10px;
-    }
-
-    #menu button, #menu input[type=number],
-    #right-navigation button, #right-navigation input[type=text],
-    #menu .menu-search-text-mobile input[type=text],
-    #menu .menu-search-text-mobile button {
-      font-size: 16px;
-      margin: 5px 0;
-      padding: 8px 10px;
       width: 100%;
-      box-sizing: border-box;
-      border-radius: 4px;
+      background-color: white;
+      color: black;
+      cursor: pointer;
+      transition: background-color 0.25s;
     }
 
-    #menu button,
-    #right-navigation button,
-    #menu .menu-search-text-mobile button {
+    #left-panel button {
       background-color: #008CBA;
       color: white;
       border: none;
-      cursor: pointer;
+      font-weight: 600;
     }
 
-    #menu button:hover,
-    #right-navigation button:hover,
-    #menu .menu-search-text-mobile button:hover {
+    #left-panel button:hover {
       background-color: #007B9A;
     }
 
-    #menu input[type=number],
-    #right-navigation input[type=text],
-    #menu .menu-search-text-mobile input[type=text] {
-      background-color: white;
-      color: black;
-      border: 1px solid #ccc;
-      text-align: center; /* Centrar texto y placeholder */
-    }
-
-    #menu input:focus,
-    #right-navigation input:focus,
-    #menu .menu-search-text-mobile input:focus {
+    #left-panel input[type=number]:focus,
+    #left-panel input[type=text]:focus {
       outline: none;
       box-shadow: 0 0 0 2px #008CBA;
     }
 
-    .menu-special-buttons {
-      margin-bottom: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .arrow-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background-color: #008CBA;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    .arrow-btn svg {
-      width: 16px;
-      height: 16px;
-      fill: white;
-    }
-
-    .arrow-btn.left svg {
-      transform: rotate(180deg);
-    }
-
+    /* PDF container grande */
     #pdf-container {
-      flex: 2 1 600px;
-      min-width: 300px;
-      max-width: 100%;
+      flex-grow: 1;
       display: flex;
       justify-content: center;
       align-items: center;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: white;
+      overflow: auto;
+      max-height: 100vh;
     }
 
     canvas {
-      border: 1px solid #ccc;
       max-width: 100%;
       height: auto;
+      display: block;
+      margin: 0 auto;
     }
 
-    /* Mobile + Tablet Layout (max-width: 1024px) */
+    /* Botones móviles debajo del PDF */
+    #mobile-buttons {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      padding: 15px 20px;
+      background-color: #f1f1f1;
+      border-top: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    #mobile-buttons button, 
+    #mobile-buttons input[type=number],
+    #mobile-buttons input[type=text] {
+      font-size: 16px;
+      padding: 10px 12px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      width: 100%;
+      background-color: white;
+      color: black;
+      cursor: pointer;
+      transition: background-color 0.25s;
+    }
+
+    #mobile-buttons button {
+      background-color: #008CBA;
+      color: white;
+      border: none;
+      font-weight: 600;
+    }
+
+    #mobile-buttons button:hover {
+      background-color: #007B9A;
+    }
+
+    #mobile-buttons input[type=number]:focus,
+    #mobile-buttons input[type=text]:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px #008CBA;
+    }
+
+    /* Responsive: Móvil y Tablet */
     @media (max-width: 1024px) {
       #container {
         flex-direction: column;
-        align-items: center;
+        height: auto;
+        padding: 10px 15px;
       }
 
-      #menu, #right-navigation {
-        display: none; /* ocultar menús en móvil/tablet */
+      #left-panel {
+        display: none; /* ocultar panel lateral */
       }
 
       #pdf-container {
-        width: 100%;
-        max-width: none;
-        order: 1;
+        max-height: none;
+        border-radius: 6px 6px 0 0;
       }
 
       #mobile-buttons {
-        order: 2;
-        margin-top: 10px;
-        width: 100%;
-        max-width: 600px;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-      }
-
-      #mobile-buttons .nav-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 10px;
-      }
-
-      #mobile-buttons button {
-        width: auto;
-        min-width: 140px;
-      }
-    }
-
-    /* Desktop Layout (min-width: 1025px) */
-    @media (min-width: 1025px) {
-      #mobile-buttons {
-        display: none;
+        display: flex; /* mostrar botones debajo PDF */
       }
     }
   </style>
 </head>
 <body>
   <div id="container">
-    <!-- Menús solo visibles en desktop -->
-    <div id="menu">
-      <div class="menu-top-mobile">
-        <h3>Navegar a:</h3>
-        <div class="menu-special-buttons">
-          <button onclick="goToPortada()">Portada</button>
-          <button onclick="goToNotas()">Notas explicativas</button>
-        </div>
+    <!-- Panel lateral solo desktop -->
+    <div id="left-panel">
+      <button onclick="goToPortada()">Portada</button>
+      <button onclick="goToNotas()">Notas explicativas</button>
+      <button onclick="goToPrevPage()">Página Anterior</button>
+      <button onclick="goToNextPage()">Página Siguiente</button>
 
-        <button class="arrow-btn left" onclick="goToPrevPage()">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 5l8 7-8 7V5z"/>
-          </svg>
-          Página Anterior
-        </button>
-        <button class="arrow-btn right" onclick="goToNextPage()">
-          Página Siguiente
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 5l8 7-8 7V5z"/>
-          </svg>
-        </button>
-      </div>
+      <input type="number" id="search-num" min="2001" max="2700" placeholder="Nro. de cántico" />
+      <button onclick="searchByNumber()">Buscar</button>
 
-      <div class="menu-bottom">
-        <h4>Nro. de cántico:</h4>
-        <input type="number" id="search-num" min="2001" max="2700" placeholder="Nro. de himno a buscar" />
-        <button onclick="searchByNumber()">Buscar</button>
-      </div>
-
-      <div class="menu-search-text-mobile">
-        <h4>Buscar frase:</h4>
-        <input type="text" id="search-text-left" placeholder="Palabra o frase a buscar" />
-        <button onclick="searchTextLeft()">Buscar</button>
-      </div>
+      <input type="text" id="search-text" placeholder="Buscar frase" />
+      <button onclick="searchTextDesktop()">Buscar</button>
     </div>
 
+    <!-- Contenedor PDF -->
     <div id="pdf-container">
       <canvas id="pdf-render"></canvas>
     </div>
+  </div>
 
-    <div id="right-navigation">
-      <h3>Navegar a:</h3>
-      <button class="arrow-btn left" onclick="goToPrevPage()">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 5l8 7-8 7V5z"/>
-        </svg>
-        Página Anterior
-      </button>
-      <button class="arrow-btn right" onclick="goToNextPage()">
-        Página Siguiente
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 5l8 7-8 7V5z"/>
-        </svg>
-      </button>
-
-      <h4>Buscar frase:</h4>
-      <input type="text" id="search-text-right" placeholder="Palabra o frase a buscar" />
-      <button onclick="searchTextRight()">Buscar</button>
+  <!-- Botones móviles debajo del PDF -->
+  <div id="mobile-buttons">
+    <div style="display: flex; gap: 10px;">
+      <button style="flex: 1;" onclick="goToPrevPage()">Página Anterior</button>
+      <button style="flex: 1;" onclick="goToNextPage()">Página Siguiente</button>
     </div>
+    <button onclick="goToPortada()">Portada</button>
+    <button onclick="goToNotas()">Notas explicativas</button>
 
-    <!-- Botones para móvil y tablet -->
-    <div id="mobile-buttons">
-      <div class="nav-buttons">
-        <button class="arrow-btn left" onclick="goToPrevPage()">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 5l8 7-8 7V5z"/>
-          </svg>
-          Página Anterior
-        </button>
-        <button class="arrow-btn right" onclick="goToNextPage()">
-          Página Siguiente
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 5l8 7-8 7V5z"/>
-          </svg>
-        </button>
-      </div>
-      <div class="menu-special-buttons">
-        <button onclick="goToPortada()">Portada</button>
-        <button onclick="goToNotas()">Notas explicativas</button>
-      </div>
-      <div>
-        <h4>Nro. de cántico:</h4>
-        <input type="number" id="search-num-mobile" min="2001" max="2700" placeholder="Nro. de himno a buscar" />
-        <button onclick="searchByNumberMobile()">Buscar</button>
-      </div>
-      <div>
-        <h4>Buscar frase:</h4>
-        <input type="text" id="search-text-mobile" placeholder="Palabra o frase a buscar" />
-        <button onclick="searchTextMobile()">Buscar</button>
-      </div>
-    </div>
+    <input type="number" id="search-num-mobile" min="2001" max="2700" placeholder="Nro. de cántico" />
+    <button onclick="searchByNumberMobile()">Buscar</button>
+
+    <input type="text" id="search-text-mobile" placeholder="Buscar frase" />
+    <button onclick="searchTextMobile()">Buscar</button>
   </div>
 
   <script>
-    const url = 'meinedatei.pdf'; // Aquí el archivo PDF
+    const url = 'meinedatei.pdf'; // Cambia aquí tu archivo PDF
 
     let pdfDoc = null,
         pageNum = 1,
@@ -313,15 +223,13 @@
 
       pageNum = num;
 
-      // Limpia inputs de búsqueda para no confundir
-      const inputsToClear = [
-        'search-num', 'search-num-mobile',
-        'search-text-left', 'search-text-right', 'search-text-mobile'
-      ];
-      inputsToClear.forEach(id => {
-        const el = document.getElementById(id);
-        if(el) el.value = '';
-      });
+      // Limpiar inputs desktop
+      document.getElementById('search-num')?.value = '';
+      document.getElementById('search-text')?.value = '';
+
+      // Limpiar inputs móviles
+      document.getElementById('search-num-mobile')?.value = '';
+      document.getElementById('search-text-mobile')?.value = '';
     }
 
     function queueRenderPage(num) {
@@ -368,7 +276,6 @@
         alert('Número válido entre 2001 y 2700.');
       }
     }
-
     function searchByNumberMobile() {
       const input = document.getElementById('search-num-mobile').value;
       const number = parseInt(input, 10);
@@ -396,15 +303,8 @@
       return -1;
     }
 
-    async function searchTextRight() {
-      const query = document.getElementById('search-text-right').value.trim().toLowerCase();
-      if (!query) return alert('Palabra o frase a buscar');
-      const foundPage = await searchText(query);
-      foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
-    }
-
-    async function searchTextLeft() {
-      const query = document.getElementById('search-text-left').value.trim().toLowerCase();
+    async function searchTextDesktop() {
+      const query = document.getElementById('search-text').value.trim().toLowerCase();
       if (!query) return alert('Palabra o frase a buscar');
       const foundPage = await searchText(query);
       foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
