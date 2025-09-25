@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -124,7 +125,7 @@
       min-width: 300px;
       max-width: 100%;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
     }
 
@@ -132,11 +133,6 @@
       border: 1px solid #ccc;
       max-width: 100%;
       height: auto;
-    }
-
-    #page-info {
-      margin-bottom: 10px;
-      font-weight: bold;
     }
 
     /* Mobile + Tablet Layout (bis 1024px) */
@@ -246,7 +242,6 @@
 
     <!-- PDF Container -->
     <div id="pdf-container">
-      <div id="page-info"></div>
       <canvas id="pdf-render"></canvas>
     </div>
 
@@ -273,7 +268,7 @@
   </div>
 
   <script>
-    const url = 'meinedatei.pdf'; // Cambiar a tu archivo PDF real
+    const url = 'meinedatei.pdf'; // Hier den Dateinamen eintragen
 
     let pdfDoc = null,
         pageNum = 1,
@@ -282,25 +277,13 @@
 
     const canvas = document.getElementById('pdf-render');
     const ctx = canvas.getContext('2d');
-
-    function normalizeText(text) {
-      return text
-        .toLowerCase()
-        .normalize("NFD") // descompone acentos
-        .replace(/[\u0300-\u036f]/g, "") // elimina acentos
-        .replace(/\s+/g, ' ') // quita espacios dobles
-        .trim();
-    }
+    let currentScale = 1.5;
 
     function renderPage(num) {
       pageRendering = true;
 
       pdfDoc.getPage(num).then(function(page) {
-        const unscaledViewport = page.getViewport({ scale: 1 });
-        const containerWidth = canvas.parentElement.clientWidth;
-        const scale = containerWidth / unscaledViewport.width;
-        const viewport = page.getViewport({ scale });
-
+        const viewport = page.getViewport({ scale: currentScale });
         canvas.height = viewport.height;
         canvas.width = viewport.width;
 
@@ -315,8 +298,6 @@
             pageNumPending = null;
           }
         });
-
-        document.getElementById('page-info').textContent = `Página ${num} de ${pdfDoc.numPages}`;
       });
 
       pageNum = num;
@@ -371,13 +352,11 @@
     }
 
     async function searchText(query) {
-      const normalizedQuery = normalizeText(query);
       for (let i = 1; i <= pdfDoc.numPages; i++) {
         const page = await pdfDoc.getPage(i);
         const textContent = await page.getTextContent();
-        const pageText = textContent.items.map(item => item.str).join(' ');
-        const normalizedPageText = normalizeText(pageText);
-        if (normalizedPageText.includes(normalizedQuery)) {
+        const pageText = textContent.items.map(item => item.str.toLowerCase()).join(' ');
+        if (pageText.includes(query)) {
           return i;
         }
       }
@@ -385,14 +364,14 @@
     }
 
     async function searchTextRight() {
-      const query = document.getElementById('search-text-right').value.trim();
+      const query = document.getElementById('search-text-right').value.trim().toLowerCase();
       if (!query) return alert('Palabra o frase a buscar');
       const foundPage = await searchText(query);
       foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
     }
 
     async function searchTextLeft() {
-      const query = document.getElementById('search-text-left').value.trim();
+      const query = document.getElementById('search-text-left').value.trim().toLowerCase();
       if (!query) return alert('Palabra o frase a buscar');
       const foundPage = await searchText(query);
       foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
