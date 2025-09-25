@@ -77,8 +77,7 @@
       background-color: white;
       color: black;
       border: 1px solid #ccc;
-      /* Zentrierung der Placeholder-Texte */
-      text-align: center;
+      text-align: center; /* Zentriere placeholder text */
     }
 
     #menu input:focus,
@@ -141,48 +140,32 @@
       #container {
         flex-direction: column;
         align-items: center;
+        gap: 8px; /* Abstand zwischen PDF und Menü */
       }
 
-      #menu, #pdf-container {
+      #pdf-container {
+        order: 1; /* PDF oben */
         width: 100%;
         max-width: none;
+        margin: 0;
+      }
+
+      #menu {
+        order: 2; /* Menü unten */
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
       }
 
       #right-navigation {
         display: none;
       }
 
-      /* Accordion Toggle Button */
-      #accordion-toggle {
-        display: block;
-        width: 100%;
+      body {
         padding: 10px;
-        margin-bottom: 10px;
-        background-color: #008CBA;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        font-size: 16px;
-        cursor: pointer;
-        box-sizing: border-box;
-      }
-
-      /* Accordion Content mit smooth toggle */
-      #accordion-content {
-        overflow: hidden;
-        max-height: 1000px; /* groß genug für alle Inhalte */
-        transition: max-height 0.4s ease;
-      }
-
-      #accordion-content.collapsed {
-        max-height: 0;
-      }
-
-      /* Menüinhalt im Accordion */
-      #menu > .menu-top-mobile,
-      #menu > .menu-bottom,
-      #menu > .menu-search-text-mobile {
-        padding: 0 10px 10px;
       }
     }
 
@@ -191,14 +174,22 @@
       #menu .menu-search-text-mobile {
         display: none;
       }
-      #accordion-toggle {
-        display: none;
-      }
-      #accordion-content {
-        max-height: none !important;
-        overflow: visible !important;
-        transition: none !important;
-      }
+    }
+
+    /* Mobile-spezifische Suchbox */
+    #menu .menu-search-text-mobile {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    #menu .menu-search-text-mobile h4 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    #menu .menu-search-text-mobile input[type=text]::placeholder {
+      color: #aaa;
+      text-align: center; /* Zentriere placeholder text */
     }
   </style>
 </head>
@@ -206,43 +197,37 @@
   <div id="container">
     <!-- Linkes Menü -->
     <div id="menu">
-      <!-- Accordion Toggle Button für Mobile -->
-      <button id="accordion-toggle" aria-expanded="true">Ocultar menú ▲</button>
-
-      <!-- Accordion Content -->
-      <div id="accordion-content">
-        <div class="menu-top-mobile">
-          <h3>Navegar a:</h3>
-          <div class="menu-special-buttons">
-            <button onclick="goToPortada()">Portada</button>
-            <button onclick="goToNotas()">Notas explicativas</button>
-          </div>
-
-          <button class="arrow-btn left" onclick="goToPrevPage()">
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 5l8 7-8 7V5z"/>
-            </svg>
-            Página Anterior
-          </button>
-          <button class="arrow-btn right" onclick="goToNextPage()">
-            Página Siguiente
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M8 5l8 7-8 7V5z"/>
-            </svg>
-          </button>
+      <div class="menu-top-mobile">
+        <h3>Navegar a:</h3>
+        <div class="menu-special-buttons">
+          <button onclick="goToPortada()">Portada</button>
+          <button onclick="goToNotas()">Notas explicativas</button>
         </div>
 
-        <div class="menu-bottom">
-          <h4>Nro. de cántico:</h4>
-          <input type="number" id="search-num" min="2001" max="2700" placeholder="Nro. himno a buscar" />
-          <button onclick="searchByNumber()">Buscar</button>
-        </div>
+        <button class="arrow-btn left" onclick="goToPrevPage()">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 5l8 7-8 7V5z"/>
+          </svg>
+          Página Anterior
+        </button>
+        <button class="arrow-btn right" onclick="goToNextPage()">
+          Página Siguiente
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 5l8 7-8 7V5z"/>
+          </svg>
+        </button>
+      </div>
 
-        <div class="menu-search-text-mobile">
-          <h4>Buscar frase:</h4>
-          <input type="text" id="search-text-left" placeholder="Buscar palabra o frase" />
-          <button onclick="searchTextLeft()">Buscar</button>
-        </div>
+      <div class="menu-bottom">
+        <h4>Nro. de cántico:</h4>
+        <input type="number" id="search-num" min="2001" max="2700" placeholder="Nro. himno a buscar" />
+        <button onclick="searchByNumber()">Buscar</button>
+      </div>
+
+      <div class="menu-search-text-mobile">
+        <h4>Buscar frase:</h4>
+        <input type="text" id="search-text-left" placeholder="Buscar palabra o frase" />
+        <button onclick="searchTextLeft()">Buscar</button>
       </div>
     </div>
 
@@ -285,9 +270,6 @@
     const ctx = canvas.getContext('2d');
     let currentScale = 1.5;
 
-    // Cache aller Seiten-Texte für schnelle Suche
-    let textCache = [];
-
     function renderPage(num) {
       pageRendering = true;
 
@@ -310,7 +292,9 @@
       });
 
       pageNum = num;
-      // Optional: Eingabefelder bleiben erhalten
+      document.getElementById('search-num').value = '';
+      const searchRight = document.getElementById('search-text-right');
+      if (searchRight) searchRight.value = '';
     }
 
     function queueRenderPage(num) {
@@ -358,67 +342,35 @@
       }
     }
 
-    function searchText(query) {
-      query = query.toLowerCase();
-      for (let i = 0; i < textCache.length; i++) {
-        if (textCache[i].includes(query)) {
-          return i + 1; // Seiten sind 1-basiert
+    async function searchText(query) {
+      for (let i = 1; i <= pdfDoc.numPages; i++) {
+        const page = await pdfDoc.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map(item => item.str.toLowerCase()).join(' ');
+        if (pageText.includes(query)) {
+          return i;
         }
       }
       return -1;
     }
 
-    function searchTextRight() {
+    async function searchTextRight() {
       const query = document.getElementById('search-text-right').value.trim().toLowerCase();
       if (!query) return alert('Palabra o frase a buscar');
-      const foundPage = searchText(query);
+      const foundPage = await searchText(query);
       foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
     }
 
-    function searchTextLeft() {
+    async function searchTextLeft() {
       const query = document.getElementById('search-text-left').value.trim().toLowerCase();
       if (!query) return alert('Palabra o frase a buscar');
-      const foundPage = searchText(query);
+      const foundPage = await searchText(query);
       foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
     }
 
-    // Accordion Toggle mit smooth animation
-    document.addEventListener('DOMContentLoaded', () => {
-      const toggleBtn = document.getElementById('accordion-toggle');
-      const accordionContent = document.getElementById('accordion-content');
-
-      toggleBtn.addEventListener('click', () => {
-        const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
-        toggleBtn.setAttribute('aria-expanded', String(!expanded));
-
-        if (expanded) {
-          accordionContent.classList.add('collapsed');
-          toggleBtn.textContent = 'Mostrar menú ▼';
-        } else {
-          accordionContent.classList.remove('collapsed');
-          toggleBtn.textContent = 'Ocultar menú ▲';
-        }
-      });
-    });
-
-    // PDF laden + Text aller Seiten cachen
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-    pdfjsLib.getDocument(url).promise.then(async function(pdfDoc_) {
+    pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
       pdfDoc = pdfDoc_;
-      // Text aller Seiten parallel laden & cachen
-      const promises = [];
-      for (let i = 1; i <= pdfDoc.numPages; i++) {
-        promises.push(pdfDoc.getPage(i).then(page => 
-          page.getTextContent().then(tc => 
-            tc.items.map(item => item.str.toLowerCase()).join(' ')
-          )
-        ));
-      }
-      textCache = await Promise.all(promises);
       renderPage(pageNum);
-    }).catch(err => {
-      alert('Error al cargar el PDF: ' + err.message);
     });
   </script>
 </body>
