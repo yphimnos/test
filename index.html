@@ -26,7 +26,6 @@
       gap: 20px;
     }
 
-    /* MENU IZQUIERDO */
     #menu {
       flex: 1 1 250px;
       min-width: 200px;
@@ -37,16 +36,16 @@
       text-align: center;
       box-sizing: border-box;
 
+      /* Centramos verticalmente y limitamos altura */
       display: flex;
       flex-direction: column;
-      justify-content: center; /* Centrar contenido verticalmente */
-      max-height: 600px;       /* Limita la altura total del menú */
-      margin: auto 0;          /* Centrado vertical dentro del contenedor padre */
+      justify-content: center;
+      max-height: 80vh;
+      margin: auto 0;
     }
 
-    .menu-top-mobile {
-      margin-bottom: 30px; /* Separación entre parte 1 y parte 2 */
-    }
+    /* Ocultar título original de Nro de cántico */
+    /* Lo cambiaremos por Búsqueda */
 
     #menu h3, #menu h4 {
       font-size: 16px;
@@ -119,7 +118,6 @@
       transform: rotate(180deg);
     }
 
-    /* CONTENEDOR PDF */
     #pdf-container {
       flex: 2 1 600px;
       min-width: 300px;
@@ -135,78 +133,113 @@
       height: auto;
     }
 
-    /* MOBILE + TABLET LAYOUT (hasta 1024px) */
+    /* Botón acordeón para móvil */
+    #menu-toggle {
+      display: none;
+      background-color: #008CBA;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      font-size: 18px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* Mobile + Tablet Layout (hasta 1024px) */
     @media (max-width: 1024px) {
       #container {
         flex-direction: column;
         align-items: center;
       }
 
-      #menu, #pdf-container {
+      #menu {
         width: 100%;
         max-width: none;
+        max-height: none;
+        margin: 0;
+        padding: 10px 10px 20px;
+        display: block;
       }
 
-      #menu {
-        order: 2;
-        max-height: none; /* Quitar max-height para que no limite en mobile */
-        margin: 0; /* resetear margen para mobile */
-        justify-content: flex-start; /* en móvil contenido no se centra vertical */
+      #menu-toggle {
+        display: block;
       }
 
-      .menu-top-mobile {
-        margin-bottom: 20px; /* algo menos en móvil */
+      #menu.collapsed {
+        display: none;
+      }
+
+      #pdf-container {
+        order: 1;
+        margin-top: 10px;
+        width: 100%;
       }
     }
 
-    /* DESKTOP LAYOUT (desde 1025px) */
+    /* Desktop Layout (desde 1025px) */
     @media (min-width: 1025px) {
-      /* Eliminado el menú derecho - ya no existe */
+      #menu .menu-search-text-mobile {
+        display: none;
+      }
     }
+
   </style>
 </head>
 <body>
   <div id="container">
-    <!-- Menu Izquierdo -->
-    <div id="menu">
-      <div class="menu-top-mobile">
-        <h3>Navegar a:</h3>
-        <div class="menu-special-buttons">
-          <button onclick="goToPortada()">Portada</button>
-          <button onclick="goToNotas()">Notas explicativas</button>
+    <!-- Menú Izquierdo -->
+    <div id="menu-wrapper" style="width: 100%; max-width: 300px;">
+      <button id="menu-toggle">Menú</button>
+      <div id="menu">
+        <div class="menu-top-mobile">
+          <h3>Navegar a:</h3>
+          <div class="menu-special-buttons">
+            <button onclick="goToPortada()">Portada</button>
+            <button onclick="goToNotas()">Notas explicativas</button>
+          </div>
+
+          <button class="arrow-btn left" onclick="goToPrevPage()">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 5l8 7-8 7V5z"/>
+            </svg>
+            Página Anterior
+          </button>
+          <button class="arrow-btn right" onclick="goToNextPage()">
+            Página Siguiente
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 5l8 7-8 7V5z"/>
+            </svg>
+          </button>
         </div>
 
-        <button class="arrow-btn left" onclick="goToPrevPage()">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 5l8 7-8 7V5z"/>
-          </svg>
-          Página Anterior
-        </button>
-        <button class="arrow-btn right" onclick="goToNextPage()">
-          Página Siguiente
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 5l8 7-8 7V5z"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="menu-bottom">
-        <h4>Nro. de cántico:</h4>
-        <input type="number" id="search-num" min="2001" max="2700" placeholder="Nro. de himno a buscar" />
-        
-        <input type="text" id="search-text-left" placeholder="Palabra o frase a buscar" />
-        <button onclick="searchBoth()">Buscar</button>
+        <div class="menu-bottom" style="margin-top: 20px;">
+          <h4>Búsqueda:</h4>
+          <input type="number" id="search-num" min="2001" max="2700" placeholder="Nro. de himno a buscar" />
+          <input type="text" id="search-text-left" placeholder="Palabra o frase a buscar" />
+          <button onclick="searchBoth()">Buscar</button>
+        </div>
       </div>
     </div>
 
-    <!-- Contenedor PDF -->
+    <!-- PDF Container -->
     <div id="pdf-container">
       <canvas id="pdf-render"></canvas>
     </div>
   </div>
 
   <script>
-    const url = 'meinedatei.pdf'; // Cambia por el nombre de tu archivo PDF
+    // Toggle menú en móvil
+    const menuToggle = document.getElementById('menu-toggle');
+    const menu = document.getElementById('menu');
+
+    menuToggle.addEventListener('click', () => {
+      menu.classList.toggle('collapsed');
+    });
+
+    const url = 'meinedatei.pdf'; // Cambiar por el nombre correcto del PDF
 
     let pdfDoc = null,
         pageNum = 1,
@@ -240,8 +273,8 @@
 
       pageNum = num;
       document.getElementById('search-num').value = '';
-      const searchTextInput = document.getElementById('search-text-left');
-      if (searchTextInput) searchTextInput.value = '';
+      const searchTextLeftInput = document.getElementById('search-text-left');
+      if (searchTextLeftInput) searchTextLeftInput.value = '';
     }
 
     function queueRenderPage(num) {
@@ -274,30 +307,12 @@
       queueRenderPage(2);
     }
 
-    function searchByNumber() {
-      const input = document.getElementById('search-num').value;
-      const number = parseInt(input, 10);
-      if (number >= 2001 && number <= 2700) {
-        const targetPage = number - 1998;
-        if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
-          queueRenderPage(targetPage);
-          return true;
-        } else {
-          alert('¡Número fuera de rango!');
-          return false;
-        }
-      } else {
-        alert('Número válido entre 2001 y 2700.');
-        return false;
-      }
-    }
-
     async function searchText(query) {
       for (let i = 1; i <= pdfDoc.numPages; i++) {
         const page = await pdfDoc.getPage(i);
         const textContent = await page.getTextContent();
         const pageText = textContent.items.map(item => item.str.toLowerCase()).join(' ');
-        if (pageText.includes(query.toLowerCase())) {
+        if (pageText.includes(query)) {
           return i;
         }
       }
@@ -305,37 +320,38 @@
     }
 
     async function searchBoth() {
-      // Primero intentar buscar número si es válido
       const numberInput = document.getElementById('search-num').value.trim();
-      if (numberInput !== '') {
+      const textInput = document.getElementById('search-text-left').value.trim().toLowerCase();
+
+      if (!numberInput && !textInput) {
+        return alert('Por favor, ingrese número o palabra/frase a buscar.');
+      }
+
+      // Prioridad a búsqueda numérica si es válida
+      if (numberInput) {
         const number = parseInt(numberInput, 10);
-        if (!isNaN(number) && number >= 2001 && number <= 2700) {
-          const pageFromNumber = number - 1998;
-          if (pageFromNumber >= 1 && pageFromNumber <= pdfDoc.numPages) {
-            queueRenderPage(pageFromNumber);
-            return;
-          } else {
-            alert('Número fuera de rango.');
-            return;
-          }
-        } else {
+        if (isNaN(number) || number < 2001 || number > 2700) {
           alert('Número válido entre 2001 y 2700.');
+          return;
+        }
+        const targetPage = number - 1998;
+        if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
+          queueRenderPage(targetPage);
+          return;
+        } else {
+          alert('¡Número fuera de rango!');
           return;
         }
       }
 
-      // Si no hay número válido, buscar texto
-      const textInput = document.getElementById('search-text-left').value.trim();
-      if (textInput === '') {
-        alert('Ingrese un número o palabra/frase para buscar.');
-        return;
-      }
-
-      const foundPage = await searchText(textInput);
-      if (foundPage > 0) {
-        queueRenderPage(foundPage);
-      } else {
-        alert('No se encontró la palabra o frase.');
+      // Si no hay número, busca por texto
+      if (textInput) {
+        const foundPage = await searchText(textInput);
+        if (foundPage > 0) {
+          queueRenderPage(foundPage);
+        } else {
+          alert('No se encontró la palabra o frase.');
+        }
       }
     }
 
