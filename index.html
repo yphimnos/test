@@ -35,6 +35,12 @@
       border: 1px solid #ccc;
       text-align: center;
       box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start; /* Boxen passen sich nur dem Inhalt an */
+      gap: 10px;
+      flex-shrink: 0;
+      height: auto; /* Boxen passen sich der Höhe des Inhalts an */
     }
 
     #menu h3, #menu h4,
@@ -182,6 +188,34 @@
     @media (min-width: 1025px) {
       #menu .menu-search-text-mobile {
         display: none;
+      }
+
+      #menu, #right-navigation {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        gap: 10px;
+        flex-shrink: 0;
+        height: auto; /* Boxen passen sich der Höhe des Inhalts an */
+      }
+
+      #menu .menu-special-buttons,
+      #right-navigation .menu-special-buttons {
+        margin-bottom: 15px;
+      }
+
+      #menu button, #right-navigation button {
+        flex-shrink: 0;
+        margin-bottom: 8px;
+      }
+
+      #pdf-container {
+        flex: 2;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        max-width: 100%;
       }
     }
 
