@@ -42,12 +42,14 @@
       font-size: 16px;
       text-align: center;
       margin-bottom: 10px;
+      cursor: default;
+      user-select: none;
+      position: relative;
+      padding-right: 25px;
     }
 
     #menu button, #menu input[type=number],
-    #right-navigation button, #right-navigation input[type=text],
-    #menu .menu-search-text-mobile input[type=text],
-    #menu .menu-search-text-mobile button {
+    #right-navigation button, #right-navigation input[type=text] {
       font-size: 16px;
       margin: 5px 0;
       padding: 8px 10px;
@@ -57,8 +59,7 @@
     }
 
     #menu button,
-    #right-navigation button,
-    #menu .menu-search-text-mobile button {
+    #right-navigation button {
       background-color: #008CBA;
       color: white;
       border: none;
@@ -66,22 +67,19 @@
     }
 
     #menu button:hover,
-    #right-navigation button:hover,
-    #menu .menu-search-text-mobile button:hover {
+    #right-navigation button:hover {
       background-color: #007B9A;
     }
 
     #menu input[type=number],
-    #right-navigation input[type=text],
-    #menu .menu-search-text-mobile input[type=text] {
+    #right-navigation input[type=text] {
       background-color: white;
       color: black;
       border: 1px solid #ccc;
     }
 
     #menu input:focus,
-    #right-navigation input:focus,
-    #menu .menu-search-text-mobile input:focus {
+    #right-navigation input:focus {
       outline: none;
       box-shadow: 0 0 0 2px #008CBA;
     }
@@ -147,10 +145,8 @@
       }
 
       #menu {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
         order: 2;
+        padding: 0;
       }
 
       #pdf-container {
@@ -162,44 +158,28 @@
         display: none;
       }
 
-      .menu-top-mobile {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
+      /* --- Acordeón móvil (solo 2 secciones) --- */
 
-      .menu-bottom {
-        order: 1;
-      }
-
-      .menu-search-text-mobile {
-        order: 2;
-        margin-top: 5px;
-      }
-
-      /* --- Acordeón móvil --- */
-
-      #menu h3.accordion-header,
-      #menu h4.accordion-header {
+      #menu h3.accordion-header {
         cursor: pointer;
         user-select: none;
         position: relative;
-        padding-right: 25px;
+        padding: 12px 25px 12px 15px;
+        background-color: #e2e2e2;
+        margin: 0 0 2px 0;
       }
 
-      #menu h3.accordion-header::after,
-      #menu h4.accordion-header::after {
+      #menu h3.accordion-header::after {
         content: '▼';
         position: absolute;
-        right: 10px;
+        right: 15px;
         top: 50%;
         transform: translateY(-50%);
-        font-size: 14px;
+        font-size: 16px;
         transition: transform 0.3s ease;
       }
 
-      #menu h3.accordion-header.active::after,
-      #menu h4.accordion-header.active::after {
+      #menu h3.accordion-header.active::after {
         transform: translateY(-50%) rotate(-180deg);
       }
 
@@ -207,10 +187,15 @@
         max-height: 0;
         overflow: hidden;
         transition: max-height 0.4s ease;
+        padding: 0 10px;
+        background-color: #fafafa;
+        border-bottom: 1px solid #ddd;
       }
 
       .accordion-content.active {
         max-height: 1000px; /* suficiente para contenido */
+        padding-top: 10px;
+        padding-bottom: 15px;
       }
 
       /* Reducir tamaño iconos flecha en móvil */
@@ -227,24 +212,22 @@
 
     /* Desktop Layout (ab 1025px) */
     @media (min-width: 1025px) {
-      #menu .menu-search-text-mobile {
-        display: none;
+      #menu .accordion-header {
+        cursor: default;
+        position: static;
+        padding-right: 0;
       }
-    }
 
-    /* Mobile-spezifische Suchbox */
-    #menu .menu-search-text-mobile {
-      margin-top: 20px;
-      text-align: center;
-    }
+      #menu .accordion-header::after {
+        content: none;
+      }
 
-    #menu .menu-search-text-mobile h4 {
-      font-size: 16px;
-      margin-bottom: 10px;
-    }
-
-    #menu .menu-search-text-mobile input[type=text]::placeholder {
-      color: #aaa;
+      #menu .accordion-content {
+        max-height: none !important;
+        padding: 0 !important;
+        border: none !important;
+        overflow: visible !important;
+      }
     }
   </style>
 </head>
@@ -252,9 +235,9 @@
   <div id="container">
     <!-- Linkes Menü -->
     <div id="menu">
-      <div class="menu-top-mobile">
-        <h3 class="accordion-header">Navegar a:</h3>
-        <div class="accordion-content menu-special-buttons">
+      <h3 class="accordion-header">Navegar a:</h3>
+      <div class="accordion-content">
+        <div class="menu-special-buttons">
           <button onclick="goToPortada()">Portada</button>
           <button onclick="goToNotas()">Notas explicativas</button>
 
@@ -273,17 +256,16 @@
         </div>
       </div>
 
-      <div class="menu-bottom">
-        <h4 class="accordion-header">Nro. de cántico:</h4>
-        <div class="accordion-content">
+      <h3 class="accordion-header">Búsqueda</h3>
+      <div class="accordion-content">
+        <div style="margin-bottom: 15px;">
+          <label for="search-num" style="font-weight: bold; display: block; margin-bottom: 5px;">Buscar nro. de cántico:</label>
           <input type="number" id="search-num" min="2001" max="2700" placeholder="Nro. de himno a buscar" />
           <button onclick="searchByNumber()">Buscar</button>
         </div>
-      </div>
 
-      <div class="menu-search-text-mobile">
-        <h4 class="accordion-header">Buscar frase:</h4>
-        <div class="accordion-content">
+        <div>
+          <label for="search-text-left" style="font-weight: bold; display: block; margin-bottom: 5px;">Buscar frase:</label>
           <input type="text" id="search-text-left" placeholder="Palabra o frase a buscar" />
           <button onclick="searchTextLeft()">Buscar</button>
         </div>
@@ -318,7 +300,7 @@
   </div>
 
   <script>
-    const url = 'meinedatei.pdf'; // Hier den Dateinamen eintragen
+    const url = 'meinedatei.pdf'; // Cambia aquí por tu archivo PDF
 
     let pdfDoc = null,
         pageNum = 1,
@@ -350,7 +332,7 @@
         });
       });
 
-      document.getElementById('page_num').textContent = num;
+      // No hay un elemento #page_num visible pero puedes actualizar aquí si lo agregas
     }
 
     function queueRenderPage(num) {
@@ -389,8 +371,8 @@
         alert('Número fuera de rango (2001-2700)');
         return;
       }
-      // Beispiel: Wenn Seitenzahlen mit Nummern korrespondieren:
-      pageNum = num - 2000; // Beispielumrechnung
+      // Ejemplo para mapear número a página
+      pageNum = num - 2000; // Ajusta según tu lógica
       if (pageNum < 1) pageNum = 1;
       if (pageNum > pdfDoc.numPages) pageNum = pdfDoc.numPages;
       queueRenderPage(pageNum);
@@ -414,10 +396,10 @@
       renderPage(pageNum);
     });
 
-    // Acordeón móvil
+    // Acordeón móvil solo 2 secciones
     function setupAccordion() {
       if (window.matchMedia("(max-width: 1024px)").matches) {
-        document.querySelectorAll('#menu .accordion-header').forEach(header => {
+        document.querySelectorAll('#menu h3.accordion-header').forEach(header => {
           header.addEventListener('click', () => {
             header.classList.toggle('active');
             const content = header.nextElementSibling;
@@ -430,9 +412,8 @@
 
     window.addEventListener('load', setupAccordion);
     window.addEventListener('resize', () => {
-      // Para evitar múltiples listeners duplicados al redimensionar:
-      // Removemos y volvemos a configurar acordeón
-      document.querySelectorAll('#menu .accordion-header').forEach(header => {
+      // Limpiar listeners para evitar duplicados
+      document.querySelectorAll('#menu h3.accordion-header').forEach(header => {
         header.replaceWith(header.cloneNode(true));
       });
       setupAccordion();
