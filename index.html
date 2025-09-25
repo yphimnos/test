@@ -198,50 +198,78 @@
 
     #menu .menu-search-text-mobile input[type=text]::placeholder {
       color: #aaa;
-      text-align: center; /* Placeholder zentriert */
     }
 
-    /* NEU: Alle placeholder-Texte zentrieren */
-    input::placeholder {
+    /* Accordion Styles */
+    #accordion-toggle {
+      display: none;
+      width: 100%;
+      padding: 10px;
+      font-size: 18px;
+      background-color: #008CBA;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
       text-align: center;
+      box-sizing: border-box;
+      margin-bottom: 10px;
+    }
+
+    #accordion-content {
+      display: block;
+    }
+
+    @media (max-width: 1024px) {
+      #accordion-toggle {
+        display: block;
+      }
+
+      #accordion-content.collapsed {
+        display: none;
+      }
     }
   </style>
 </head>
 <body>
   <div id="container">
-    <!-- Linkes Menü -->
+    <!-- Linkes Menü mit Accordion -->
     <div id="menu">
-      <div class="menu-top-mobile">
-        <h3>Navegar a:</h3>
-        <div class="menu-special-buttons">
-          <button onclick="goToPortada()">Portada</button>
-          <button onclick="goToNotas()">Notas explicativas</button>
+      <button id="accordion-toggle" aria-expanded="false">Mostrar menú ▼</button>
+      
+      <div id="accordion-content">
+        <div class="menu-top-mobile">
+          <h3>Navegar a:</h3>
+          <div class="menu-special-buttons">
+            <button onclick="goToPortada()">Portada</button>
+            <button onclick="goToNotas()">Notas explicativas</button>
+          </div>
+
+          <button class="arrow-btn left" onclick="goToPrevPage()">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 5l8 7-8 7V5z"/>
+            </svg>
+            Página Anterior
+          </button>
+          <button class="arrow-btn right" onclick="goToNextPage()">
+            Página Siguiente
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 5l8 7-8 7V5z"/>
+            </svg>
+          </button>
         </div>
 
-        <button class="arrow-btn left" onclick="goToPrevPage()">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 5l8 7-8 7V5z"/>
-          </svg>
-          Página Anterior
-        </button>
-        <button class="arrow-btn right" onclick="goToNextPage()">
-          Página Siguiente
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 5l8 7-8 7V5z"/>
-          </svg>
-        </button>
-      </div>
+        <div class="menu-bottom">
+          <h4>Nro. de cántico:</h4>
+          <input type="number" id="search-num" min="2001" max="2700" placeholder="Nro. himno a buscar" />
+          <button onclick="searchByNumber()">Buscar</button>
+        </div>
 
-      <div class="menu-bottom">
-        <h4>Nro. de cántico:</h4>
-        <input type="number" id="search-num" min="2001" max="2700" placeholder="Nro. himno a buscar" />
-        <button onclick="searchByNumber()">Buscar</button>
-      </div>
-
-      <div class="menu-search-text-mobile">
-        <h4>Buscar frase:</h4>
-        <input type="text" id="search-text-left" placeholder="Buscar palabra o frase" />
-        <button onclick="searchTextLeft()">Buscar</button>
+        <div class="menu-search-text-mobile">
+          <h4>Buscar frase:</h4>
+          <input type="text" id="search-text-left" placeholder="Buscar palabra o frase" />
+          <button onclick="searchTextLeft()">Buscar</button>
+        </div>
       </div>
     </div>
 
@@ -381,6 +409,28 @@
       const foundPage = await searchText(query);
       foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
     }
+
+    // Accordion Toggle
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggleBtn = document.getElementById('accordion-toggle');
+      const accordionContent = document.getElementById('accordion-content');
+
+      toggleBtn.addEventListener('click', () => {
+        const expanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+        toggleBtn.setAttribute('aria-expanded', String(!expanded));
+
+        if (expanded) {
+          accordionContent.classList.add('collapsed');
+          toggleBtn.textContent = 'Mostrar menú ▼';
+        } else {
+          accordionContent.classList.remove('collapsed');
+          toggleBtn.textContent = 'Ocultar menú ▲';
+        }
+      });
+    });
+
+    // PDF laden und erste Seite rendern
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
     pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
       pdfDoc = pdfDoc_;
