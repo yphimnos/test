@@ -134,15 +134,16 @@
       height: auto;
     }
 
-    /* Mobile + Tablet Layout (hasta 1024px) */
+    /* Mobile + Tablet Layout (bis 1024px) */
     @media (max-width: 1024px) {
       #container {
         flex-direction: column;
         align-items: center;
       }
 
+      /* Ocultar menús laterales en mobile/tablet */
       #menu, #right-navigation {
-        display: none !important;
+        display: none;
       }
 
       #pdf-container {
@@ -152,30 +153,118 @@
         margin-bottom: 10px;
       }
 
-      #mobile-menu {
-        display: block !important;
+      /* Mostrar nuevo contenedor con controles en móvil */
+      #mobile-controls {
+        display: block;
+        width: 100%;
         max-width: 600px;
-        margin: 0 auto 20px auto;
+        background-color: #f1f1f1;
+        border: 1px solid #ccc;
+        padding: 15px 10px;
+        box-sizing: border-box;
         text-align: center;
         order: 2;
+        border-radius: 5px;
       }
 
-      .menu-top-mobile {
-        display: none;
+      #mobile-controls h3, #mobile-controls h4 {
+        margin: 10px 0 8px;
+        font-size: 16px;
+      }
+
+      #mobile-controls .menu-special-buttons,
+      #mobile-controls .search-number,
+      #mobile-controls .search-texts {
+        margin-bottom: 15px;
+      }
+
+      #mobile-controls button,
+      #mobile-controls input[type=number],
+      #mobile-controls input[type=text] {
+        width: 100%;
+        margin: 5px 0;
+        padding: 8px 10px;
+        font-size: 16px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+
+      #mobile-controls button {
+        background-color: #008CBA;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+
+      #mobile-controls button:hover {
+        background-color: #007B9A;
+      }
+
+      .arrow-btn.mobile {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background-color: #008CBA;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        width: 48%;
+        box-sizing: border-box;
+      }
+
+      .arrow-btn.mobile svg {
+        width: 16px;
+        height: 16px;
+        fill: white;
+      }
+
+      .arrow-btn.mobile.left svg {
+        transform: rotate(180deg);
+      }
+
+      /* Para que los dos botones de flecha estén en línea */
+      #mobile-controls .arrow-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+      }
+
+      /* Separar las búsquedas del resto */
+      #mobile-controls .search-number,
+      #mobile-controls .search-texts > div {
+        margin-bottom: 10px;
       }
     }
 
-    /* Desktop Layout (desde 1025px) */
+    /* Desktop Layout (ab 1025px) */
     @media (min-width: 1025px) {
       #menu .menu-search-text-mobile {
         display: none;
       }
-
-      #mobile-menu {
+      /* Ocultar el contenedor móvil en desktop */
+      #mobile-controls {
         display: none !important;
       }
     }
 
+    /* Mobile-spezifische Suchbox */
+    #menu .menu-search-text-mobile {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    #menu .menu-search-text-mobile h4 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    #menu .menu-search-text-mobile input[type=text]::placeholder {
+      color: #aaa;
+    }
   </style>
 </head>
 <body>
@@ -221,41 +310,6 @@
       <canvas id="pdf-render"></canvas>
     </div>
 
-    <!-- Nuevo menú móvil debajo del PDF -->
-    <div id="mobile-menu" style="display:none;">
-      <div class="menu-special-buttons">
-        <button onclick="goToPrevPage()" class="arrow-btn left" style="max-width: 200px; margin: 5px auto; display: inline-flex; justify-content: center; align-items: center; gap: 8px;">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:16px; height:16px; fill:white; transform: rotate(180deg);">
-            <path d="M8 5l8 7-8 7V5z"/>
-          </svg>
-          Página Anterior
-        </button>
-        <button onclick="goToNextPage()" class="arrow-btn right" style="max-width: 200px; margin: 5px auto; display: inline-flex; justify-content: center; align-items: center; gap: 8px;">
-          Página Siguiente
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:16px; height:16px; fill:white;">
-            <path d="M8 5l8 7-8 7V5z"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="menu-special-buttons" style="margin-top: 10px;">
-        <button onclick="goToPortada()" style="max-width: 200px; margin: 5px auto;">Portada</button>
-        <button onclick="goToNotas()" style="max-width: 200px; margin: 5px auto;">Notas explicativas</button>
-      </div>
-
-      <div style="margin-top: 10px;">
-        <h4 style="margin-bottom: 5px;">Nro. de cántico:</h4>
-        <input type="number" id="search-num-mobile" min="2001" max="2700" placeholder="Nro. de himno a buscar" style="max-width: 200px; margin: 5px auto; padding:8px; border-radius:4px; border:1px solid #ccc;" />
-        <button onclick="searchByNumberMobile()" style="max-width: 200px; margin: 5px auto;">Buscar</button>
-      </div>
-
-      <div style="margin-top: 10px;">
-        <h4 style="margin-bottom: 5px;">Buscar frase:</h4>
-        <input type="text" id="search-text-mobile" placeholder="Palabra o frase a buscar" style="max-width: 200px; margin: 5px auto; padding:8px; border-radius:4px; border:1px solid #ccc;" />
-        <button onclick="searchTextMobile()" style="max-width: 200px; margin: 5px auto;">Buscar</button>
-      </div>
-    </div>
-
     <!-- Rechtes Menü (nur Desktop) -->
     <div id="right-navigation">
       <h3>Navegar a:</h3>
@@ -278,8 +332,49 @@
     </div>
   </div>
 
+  <!-- NUEVO: Controles móviles bajo el visor PDF, sólo en móvil/tablet -->
+  <div id="mobile-controls" style="display:none;">
+    <div class="arrow-buttons">
+      <button class="arrow-btn mobile left" onclick="goToPrevPage()">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 5l8 7-8 7V5z"/>
+        </svg>
+        Página Anterior
+      </button>
+      <button class="arrow-btn mobile right" onclick="goToNextPage()">
+        Página Siguiente
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 5l8 7-8 7V5z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="menu-special-buttons">
+      <button onclick="goToPortada()">Portada</button>
+      <button onclick="goToNotas()">Notas explicativas</button>
+    </div>
+
+    <div class="search-number">
+      <h4>Nro. de cántico:</h4>
+      <input type="number" id="mobile-search-num" min="2001" max="2700" placeholder="Nro. de himno a buscar" />
+      <button onclick="mobileSearchByNumber()">Buscar</button>
+    </div>
+
+    <div class="search-texts">
+      <h4>Buscar frase:</h4>
+      <div>
+        <input type="text" id="mobile-search-text-left" placeholder="Palabra o frase a buscar" />
+        <button onclick="mobileSearchTextLeft()">Buscar</button>
+      </div>
+      <div>
+        <input type="text" id="mobile-search-text-right" placeholder="Palabra o frase a buscar" />
+        <button onclick="mobileSearchTextRight()">Buscar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    const url = 'meinedatei.pdf'; // Aquí el archivo PDF
+    const url = 'meinedatei.pdf'; // Hier den Dateinamen eintragen
 
     let pdfDoc = null,
         pageNum = 1,
@@ -312,16 +407,19 @@
       });
 
       pageNum = num;
-      // Limpiar inputs de menús izquierdo y derecho
       document.getElementById('search-num').value = '';
       const searchRight = document.getElementById('search-text-right');
       if (searchRight) searchRight.value = '';
 
-      // Limpiar inputs móviles
-      const searchNumMobile = document.getElementById('search-num-mobile');
-      if (searchNumMobile) searchNumMobile.value = '';
-      const searchTextMobileInput = document.getElementById('search-text-mobile');
-      if (searchTextMobileInput) searchTextMobileInput.value = '';
+      // También limpiar inputs móviles
+      const mobileNum = document.getElementById('mobile-search-num');
+      if(mobileNum) mobileNum.value = '';
+
+      const mobileSearchLeft = document.getElementById('mobile-search-text-left');
+      if(mobileSearchLeft) mobileSearchLeft.value = '';
+
+      const mobileSearchRight = document.getElementById('mobile-search-text-right');
+      if(mobileSearchRight) mobileSearchRight.value = '';
     }
 
     function queueRenderPage(num) {
@@ -369,9 +467,9 @@
       }
     }
 
-    // Función para búsqueda por número móvil
-    function searchByNumberMobile() {
-      const input = document.getElementById('search-num-mobile').value;
+    // Funciones para búsquedas móviles: reutilizan la lógica pero con IDs móviles
+    function mobileSearchByNumber() {
+      const input = document.getElementById('mobile-search-num').value;
       const number = parseInt(input, 10);
       if (number >= 2001 && number <= 2700) {
         const targetPage = number - 1998;
@@ -411,8 +509,16 @@
       foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
     }
 
-    async function searchTextMobile() {
-      const query = document.getElementById('search-text-mobile').value.trim().toLowerCase();
+    // Funciones para inputs móviles
+    async function mobileSearchTextRight() {
+      const query = document.getElementById('mobile-search-text-right').value.trim().toLowerCase();
+      if (!query) return alert('Palabra o frase a buscar');
+      const foundPage = await searchText(query);
+      foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
+    }
+
+    async function mobileSearchTextLeft() {
+      const query = document.getElementById('mobile-search-text-left').value.trim().toLowerCase();
       if (!query) return alert('Palabra o frase a buscar');
       const foundPage = await searchText(query);
       foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
@@ -421,20 +527,20 @@
     pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
       pdfDoc = pdfDoc_;
       renderPage(pageNum);
+      // Mostrar o ocultar controles móviles según ancho actual
+      toggleMobileControls();
+      window.addEventListener('resize', toggleMobileControls);
     });
 
-    // Mostrar o ocultar menú móvil según tamaño de pantalla en carga y resize
-    function checkScreenSize() {
-      const mobileMenu = document.getElementById('mobile-menu');
-      if (window.innerWidth <= 1024) {
-        mobileMenu.style.display = 'block';
+    // Función para mostrar/ocultar controles móviles según ancho ventana
+    function toggleMobileControls() {
+      const mc = document.getElementById('mobile-controls');
+      if(window.innerWidth <= 1024) {
+        mc.style.display = 'block';
       } else {
-        mobileMenu.style.display = 'none';
+        mc.style.display = 'none';
       }
     }
-
-    window.addEventListener('load', checkScreenSize);
-    window.addEventListener('resize', checkScreenSize);
   </script>
 </body>
 </html>
