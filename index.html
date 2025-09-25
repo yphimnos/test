@@ -141,102 +141,54 @@
         align-items: center;
       }
 
-      /* Ocultar menús laterales en mobile/tablet */
       #menu, #right-navigation {
-        display: none;
+        display: none !important;
       }
 
       #pdf-container {
+        order: 1;
         width: 100%;
         max-width: none;
-        order: 1;
-        margin-bottom: 10px;
+        margin: 0 auto;
       }
 
-      /* Mostrar nuevo contenedor con controles en móvil */
+      /* Nuevo bloque controles móviles */
       #mobile-controls {
-        display: block;
+        display: block !important;
         width: 100%;
         max-width: 600px;
-        background-color: #f1f1f1;
-        border: 1px solid #ccc;
-        padding: 15px 10px;
-        box-sizing: border-box;
+        margin: 20px auto 0;
         text-align: center;
-        order: 2;
-        border-radius: 5px;
       }
 
-      #mobile-controls h3, #mobile-controls h4 {
-        margin: 10px 0 8px;
-        font-size: 16px;
-      }
-
-      #mobile-controls .menu-special-buttons,
-      #mobile-controls .search-number,
-      #mobile-controls .search-texts {
-        margin-bottom: 15px;
-      }
-
-      #mobile-controls button,
-      #mobile-controls input[type=number],
-      #mobile-controls input[type=text] {
-        width: 100%;
-        margin: 5px 0;
-        padding: 8px 10px;
-        font-size: 16px;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-      }
-
-      #mobile-controls button {
-        background-color: #008CBA;
-        color: white;
-        border: none;
-        cursor: pointer;
-      }
-
-      #mobile-controls button:hover {
-        background-color: #007B9A;
-      }
-
-      .arrow-btn.mobile {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        background-color: #008CBA;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        padding: 10px 20px;
-        font-size: 16px;
-        cursor: pointer;
-        width: 48%;
-        box-sizing: border-box;
-      }
-
-      .arrow-btn.mobile svg {
-        width: 16px;
-        height: 16px;
-        fill: white;
-      }
-
-      .arrow-btn.mobile.left svg {
-        transform: rotate(180deg);
-      }
-
-      /* Para que los dos botones de flecha estén en línea */
       #mobile-controls .arrow-buttons {
         display: flex;
         justify-content: space-between;
         margin-bottom: 15px;
       }
 
-      /* Separar las búsquedas del resto */
-      #mobile-controls .search-number,
-      #mobile-controls .search-texts > div {
+      #mobile-controls .arrow-btn.mobile {
+        width: 48%;
+      }
+
+      #mobile-controls .menu-special-buttons button,
+      #mobile-controls button {
+        margin: 5px 0;
+        width: 100%;
+        max-width: 300px;
+      }
+
+      #mobile-controls input[type=number],
+      #mobile-controls input[type=text] {
+        width: 100%;
+        max-width: 300px;
         margin-bottom: 10px;
+      }
+
+      /* Ocultar búsqueda duplicada en el menú */
+      #menu .menu-search-text-mobile,
+      #menu .menu-bottom {
+        display: none;
       }
     }
 
@@ -245,7 +197,6 @@
       #menu .menu-search-text-mobile {
         display: none;
       }
-      /* Ocultar el contenedor móvil en desktop */
       #mobile-controls {
         display: none !important;
       }
@@ -332,16 +283,16 @@
     </div>
   </div>
 
-  <!-- NUEVO: Controles móviles bajo el visor PDF, sólo en móvil/tablet -->
+  <!-- Nuevo bloque controles móviles debajo del visor PDF -->
   <div id="mobile-controls" style="display:none;">
     <div class="arrow-buttons">
-      <button class="arrow-btn mobile left" onclick="goToPrevPage()">
+      <button class="arrow-btn left mobile" onclick="goToPrevPage()">
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M8 5l8 7-8 7V5z"/>
         </svg>
         Página Anterior
       </button>
-      <button class="arrow-btn mobile right" onclick="goToNextPage()">
+      <button class="arrow-btn right mobile" onclick="goToNextPage()">
         Página Siguiente
         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path d="M8 5l8 7-8 7V5z"/>
@@ -354,22 +305,16 @@
       <button onclick="goToNotas()">Notas explicativas</button>
     </div>
 
-    <div class="search-number">
+    <div class="menu-bottom">
       <h4>Nro. de cántico:</h4>
-      <input type="number" id="mobile-search-num" min="2001" max="2700" placeholder="Nro. de himno a buscar" />
-      <button onclick="mobileSearchByNumber()">Buscar</button>
+      <input type="number" id="search-num-mobile" min="2001" max="2700" placeholder="Nro. de himno a buscar" />
+      <button onclick="searchByNumberMobile()">Buscar</button>
     </div>
 
-    <div class="search-texts">
+    <div class="menu-search-text-mobile">
       <h4>Buscar frase:</h4>
-      <div>
-        <input type="text" id="mobile-search-text-left" placeholder="Palabra o frase a buscar" />
-        <button onclick="mobileSearchTextLeft()">Buscar</button>
-      </div>
-      <div>
-        <input type="text" id="mobile-search-text-right" placeholder="Palabra o frase a buscar" />
-        <button onclick="mobileSearchTextRight()">Buscar</button>
-      </div>
+      <input type="text" id="search-text-mobile" placeholder="Palabra o frase a buscar" />
+      <button onclick="searchTextMobile()">Buscar</button>
     </div>
   </div>
 
@@ -410,16 +355,11 @@
       document.getElementById('search-num').value = '';
       const searchRight = document.getElementById('search-text-right');
       if (searchRight) searchRight.value = '';
-
-      // También limpiar inputs móviles
-      const mobileNum = document.getElementById('mobile-search-num');
-      if(mobileNum) mobileNum.value = '';
-
-      const mobileSearchLeft = document.getElementById('mobile-search-text-left');
-      if(mobileSearchLeft) mobileSearchLeft.value = '';
-
-      const mobileSearchRight = document.getElementById('mobile-search-text-right');
-      if(mobileSearchRight) mobileSearchRight.value = '';
+      // Limpiar inputs móviles también
+      const searchNumMobile = document.getElementById('search-num-mobile');
+      if (searchNumMobile) searchNumMobile.value = '';
+      const searchTextMobileInput = document.getElementById('search-text-mobile');
+      if (searchTextMobileInput) searchTextMobileInput.value = '';
     }
 
     function queueRenderPage(num) {
@@ -467,22 +407,6 @@
       }
     }
 
-    // Funciones para búsquedas móviles: reutilizan la lógica pero con IDs móviles
-    function mobileSearchByNumber() {
-      const input = document.getElementById('mobile-search-num').value;
-      const number = parseInt(input, 10);
-      if (number >= 2001 && number <= 2700) {
-        const targetPage = number - 1998;
-        if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
-          queueRenderPage(targetPage);
-        } else {
-          alert('¡Número fuera de rango!');
-        }
-      } else {
-        alert('Número válido entre 2001 y 2700.');
-      }
-    }
-
     async function searchText(query) {
       for (let i = 1; i <= pdfDoc.numPages; i++) {
         const page = await pdfDoc.getPage(i);
@@ -509,38 +433,33 @@
       foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
     }
 
-    // Funciones para inputs móviles
-    async function mobileSearchTextRight() {
-      const query = document.getElementById('mobile-search-text-right').value.trim().toLowerCase();
-      if (!query) return alert('Palabra o frase a buscar');
-      const foundPage = await searchText(query);
-      foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
-    }
-
-    async function mobileSearchTextLeft() {
-      const query = document.getElementById('mobile-search-text-left').value.trim().toLowerCase();
-      if (!query) return alert('Palabra o frase a buscar');
-      const foundPage = await searchText(query);
-      foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
-    }
-
-    pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
-      pdfDoc = pdfDoc_;
-      renderPage(pageNum);
-      // Mostrar o ocultar controles móviles según ancho actual
-      toggleMobileControls();
-      window.addEventListener('resize', toggleMobileControls);
-    });
-
-    // Función para mostrar/ocultar controles móviles según ancho ventana
-    function toggleMobileControls() {
-      const mc = document.getElementById('mobile-controls');
-      if(window.innerWidth <= 1024) {
-        mc.style.display = 'block';
+    // Nuevas funciones para inputs móviles con IDs diferentes
+    function searchByNumberMobile() {
+      const input = document.getElementById('search-num-mobile').value;
+      const number = parseInt(input, 10);
+      if (number >= 2001 && number <= 2700) {
+        const targetPage = number - 1998;
+        if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
+          queueRenderPage(targetPage);
+        } else {
+          alert('¡Número fuera de rango!');
+        }
       } else {
-        mc.style.display = 'none';
+        alert('Número válido entre 2001 y 2700.');
       }
     }
+
+    async function searchTextMobile() {
+      const query = document.getElementById('search-text-mobile').value.trim().toLowerCase();
+      if (!query) return alert('Palabra o frase a buscar');
+      const foundPage = await searchText(query);
+      foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
+    }
+
+    pdfjsLib.getDocument(url).promise.then(pdfDoc_ => {
+      pdfDoc = pdfDoc_;
+      renderPage(pageNum);
+    });
   </script>
 </body>
 </html>
