@@ -1,377 +1,250 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Visor de PDF con Menú Interactivo</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      margin: 0;
-      padding: 20px;
-      min-height: 100vh;
-      box-sizing: border-box;
-      background-color: #f9f9f9;
-    }
-
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Visor de PDF con Menú Interactivo</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    display: flex; justify-content: center;
+    margin: 0; padding: 10px;
+    min-height: 100vh; box-sizing: border-box;
+    background: #f9f9f9;
+  }
+  #container {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    width: 100%; max-width: 1400px; gap: 20px;
+  }
+  #menu, #right-navigation {
+    flex: 1 1 250px;
+    min-width: 200px; max-width: 300px;
+    background: #f1f1f1; padding: 10px; border: 1px solid #ccc;
+    text-align: center; box-sizing: border-box;
+  }
+  #menu h3, #menu h4, #right-navigation h3, #right-navigation h4 {
+    font-size: 16px; margin-bottom: 10px; text-align: center;
+  }
+  button, input[type=number], input[type=text], #menu .menu-search-text-mobile button, #menu .menu-search-text-mobile input[type=text] {
+    font-size: 16px; margin: 5px 0; padding: 8px 10px;
+    width: 100%; box-sizing: border-box; border-radius: 4px;
+  }
+  button, #menu .menu-search-text-mobile button {
+    background: #008CBA; color: white; border: none; cursor: pointer;
+  }
+  button:hover, #menu .menu-search-text-mobile button:hover {
+    background: #007B9A;
+  }
+  input[type=number], input[type=text], #menu .menu-search-text-mobile input[type=text] {
+    background: white; color: black; border: 1px solid #ccc;
+  }
+  input:focus {
+    outline: none; box-shadow: 0 0 0 2px #008CBA;
+  }
+  .menu-special-buttons {
+    margin-bottom: 15px; display: flex; flex-direction: column; gap: 8px;
+  }
+  .arrow-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: #008CBA; color: white; border: none; border-radius: 5px;
+    padding: 10px 20px; font-size: 16px; cursor: pointer; width: 100%;
+    box-sizing: border-box;
+  }
+  .arrow-btn svg {
+    width: 16px; height: 16px; fill: white;
+  }
+  .arrow-btn.left svg {
+    transform: rotate(180deg);
+  }
+  #pdf-container {
+    flex: 2 1 600px; min-width: 300px; max-width: 100%;
+    display: flex; justify-content: center; align-items: center;
+  }
+  canvas {
+    border: 1px solid #ccc; max-width: 100%; height: auto;
+  }
+  input::placeholder {
+    text-align: center;
+  }
+  @media (max-width: 1024px) {
     #container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      width: 100%;
-      max-width: 1400px;
-      gap: 20px;
+      flex-direction: column; align-items: center; gap: 8px;
     }
-
-    #menu, #right-navigation {
-      flex: 1 1 250px;
-      min-width: 200px;
-      max-width: 300px;
-      background-color: #f1f1f1;
-      padding: 10px;
-      border: 1px solid #ccc;
-      text-align: center;
-      box-sizing: border-box;
+    #menu, #pdf-container {
+      width: 100%; max-width: none;
     }
-
-    #menu h3, #menu h4,
-    #right-navigation h3, #right-navigation h4 {
-      font-size: 16px;
-      text-align: center;
-      margin-bottom: 10px;
+    #menu {
+      order: 2; padding: 0;
     }
-
-    #menu button, #menu input[type=number],
-    #right-navigation button, #right-navigation input[type=text],
-    #menu .menu-search-text-mobile input[type=text],
-    #menu .menu-search-text-mobile button {
-      font-size: 16px;
-      margin: 5px 0;
-      padding: 8px 10px;
-      width: 100%;
-      box-sizing: border-box;
-      border-radius: 4px;
+    #pdf-container {
+      order: 1;
     }
-
-    #menu button,
-    #right-navigation button,
-    #menu .menu-search-text-mobile button {
-      background-color: #008CBA;
-      color: white;
-      border: none;
-      cursor: pointer;
+    #right-navigation {
+      display: none;
     }
-
-    #menu button:hover,
-    #right-navigation button:hover,
-    #menu .menu-search-text-mobile button:hover {
-      background-color: #007B9A;
+    #menu h3 {
+      margin: 0;
     }
-
-    #menu input[type=number],
-    #right-navigation input[type=text],
-    #menu .menu-search-text-mobile input[type=text] {
-      background-color: white;
-      color: black;
-      border: 1px solid #ccc;
-      text-align: center; /* Zentriere placeholder text */
+    #menu .accordion-button {
+      width: 100%; background: #008CBA; color: white; border: none;
+      padding: 12px; font-size: 18px; cursor: pointer; border-radius: 5px;
+      text-align: center; box-sizing: border-box; user-select: none;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
     }
-
-    #menu input:focus,
-    #right-navigation input:focus,
-    #menu .menu-search-text-mobile input:focus {
-      outline: none;
-      box-shadow: 0 0 0 2px #008CBA;
+    #menu .accordion-button svg {
+      transition: transform 0.3s ease; width: 20px; height: 20px; fill: white;
     }
-
-    .menu-special-buttons {
-      margin-bottom: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .arrow-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background-color: #008CBA;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      padding: 10px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    .arrow-btn svg {
-      width: 16px;
-      height: 16px;
-      fill: white;
-    }
-
-    .arrow-btn.left svg {
+    #menu .accordion-button.active svg {
       transform: rotate(180deg);
     }
-
-    #pdf-container {
-      flex: 2 1 600px;
-      min-width: 300px;
-      max-width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    #menu .accordion-content {
+      max-height: 0; overflow: hidden; transition: max-height 0.35s ease;
+      padding: 0 10px; background: #f1f1f1; border-radius: 0 0 5px 5px;
+      box-sizing: border-box;
     }
-
-    canvas {
-      border: 1px solid #ccc;
-      max-width: 100%;
-      height: auto;
+    #menu .accordion-content.open {
+      max-height: 1000px; padding-top: 10px; padding-bottom: 10px;
     }
-
-    /* Mobile + Tablet Layout (bis 1024px) */
-    @media (max-width: 1024px) {
-      #container {
-        flex-direction: column;
-        align-items: center;
-        gap: 8px; /* Abstand zwischen PDF und Menü */
-      }
-
-      #pdf-container {
-        order: 1; /* PDF oben */
-        width: 100%;
-        max-width: none;
-        margin: 0;
-      }
-
-      #menu {
-        order: 2; /* Menü unten */
-        width: 100%;
-        max-width: none;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-
-      #right-navigation {
-        display: none;
-      }
-
-      body {
-        padding: 10px;
-      }
+    #menu .menu-top-mobile,
+    #menu .menu-bottom,
+    #menu .menu-search-text-mobile {
+      display: block;
     }
-
-    /* Desktop Layout (ab 1025px) */
-    @media (min-width: 1025px) {
-      #menu .menu-search-text-mobile {
-        display: none;
-      }
-    }
-
-    /* Mobile-spezifische Suchbox */
     #menu .menu-search-text-mobile {
       margin-top: 20px;
-      text-align: center;
     }
-
-    #menu .menu-search-text-mobile h4 {
-      font-size: 16px;
-      margin-bottom: 10px;
+  }
+  @media (min-width: 1025px) {
+    #menu .menu-search-text-mobile {
+      display: none;
     }
-
-    #menu .menu-search-text-mobile input[type=text]::placeholder {
-      color: #aaa;
-      text-align: center; /* Zentriere placeholder text */
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <div id="container">
-    <!-- Linkes Menü -->
-    <div id="menu">
+<div id="container">
+  <div id="menu">
+    <h3>
+      <button class="accordion-button" aria-expanded="false" aria-controls="menu-content" id="accordion-btn">
+        Mostrar menú
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5l8 7-8 7V5z"/></svg>
+      </button>
+    </h3>
+    <div class="accordion-content" id="menu-content" role="region" aria-labelledby="accordion-btn" tabindex="0">
       <div class="menu-top-mobile">
         <h3>Navegar a:</h3>
         <div class="menu-special-buttons">
           <button onclick="goToPortada()">Portada</button>
           <button onclick="goToNotas()">Notas explicativas</button>
         </div>
-
         <button class="arrow-btn left" onclick="goToPrevPage()">
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 5l8 7-8 7V5z"/>
-          </svg>
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5l8 7-8 7V5z"/></svg>
           Página Anterior
         </button>
         <button class="arrow-btn right" onclick="goToNextPage()">
           Página Siguiente
-          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 5l8 7-8 7V5z"/>
-          </svg>
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5l8 7-8 7V5z"/></svg>
         </button>
       </div>
-
       <div class="menu-bottom">
         <h4>Nro. de cántico:</h4>
         <input type="number" id="search-num" min="2001" max="2700" placeholder="Nro. himno a buscar" />
         <button onclick="searchByNumber()">Buscar</button>
       </div>
-
       <div class="menu-search-text-mobile">
         <h4>Buscar frase:</h4>
         <input type="text" id="search-text-left" placeholder="Buscar palabra o frase" />
         <button onclick="searchTextLeft()">Buscar</button>
       </div>
     </div>
-
-    <!-- PDF Container -->
-    <div id="pdf-container">
-      <canvas id="pdf-render"></canvas>
-    </div>
-
-    <!-- Rechtes Menü (nur Desktop) -->
-    <div id="right-navigation">
-      <h3>Navegar a:</h3>
-      <button class="arrow-btn left" onclick="goToPrevPage()">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 5l8 7-8 7V5z"/>
-        </svg>
-        Página Anterior
-      </button>
-      <button class="arrow-btn right" onclick="goToNextPage()">
-        Página Siguiente
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path d="M8 5l8 7-8 7V5z"/>
-        </svg>
-      </button>
-
-      <h4>Buscar frase:</h4>
-      <input type="text" id="search-text-right" placeholder="Buscar palabra o frase" />
-      <button onclick="searchTextRight()">Buscar</button>
-    </div>
   </div>
-
-  <script>
-    const url = 'meinedatei.pdf'; // Hier den Dateinamen eintragen
-
-    let pdfDoc = null,
-        pageNum = 1,
-        pageRendering = false,
-        pageNumPending = null;
-
-    const canvas = document.getElementById('pdf-render');
-    const ctx = canvas.getContext('2d');
-    let currentScale = 1.5;
-
-    function renderPage(num) {
-      pageRendering = true;
-
-      pdfDoc.getPage(num).then(function(page) {
-        const viewport = page.getViewport({ scale: currentScale });
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-
-        const renderContext = {
-          canvasContext: ctx,
-          viewport: viewport
-        };
-        page.render(renderContext).promise.then(() => {
-          pageRendering = false;
-          if (pageNumPending !== null) {
-            renderPage(pageNumPending);
-            pageNumPending = null;
-          }
-        });
+  <div id="pdf-container"><canvas id="pdf-render"></canvas></div>
+  <div id="right-navigation">
+    <h3>Navegar a:</h3>
+    <button class="arrow-btn left" onclick="goToPrevPage()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5l8 7-8 7V5z"/></svg>
+      Página Anterior
+    </button>
+    <button class="arrow-btn right" onclick="goToNextPage()">
+      Página Siguiente
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5l8 7-8 7V5z"/></svg>
+    </button>
+    <h4>Buscar frase:</h4>
+    <input type="text" id="search-text-right" placeholder="Buscar palabra o frase" />
+    <button onclick="searchTextRight()">Buscar</button>
+  </div>
+</div>
+<script>
+  const url='meinedatei.pdf';let pdfDoc=null,pageNum=1,pageRendering=false,pageNumPending=null;
+  const canvas=document.getElementById('pdf-render'),ctx=canvas.getContext('2d'),currentScale=1.5;
+  function renderPage(num){
+    pageRendering=true;
+    pdfDoc.getPage(num).then(page=>{
+      const viewport=page.getViewport({scale:currentScale});
+      canvas.height=viewport.height;canvas.width=viewport.width;
+      const renderContext={canvasContext:ctx,viewport};
+      page.render(renderContext).promise.then(()=>{
+        pageRendering=false;
+        if(pageNumPending!==null){
+          renderPage(pageNumPending);
+          pageNumPending=null;
+        }
       });
-
-      pageNum = num;
-      document.getElementById('search-num').value = '';
-      const searchRight = document.getElementById('search-text-right');
-      if (searchRight) searchRight.value = '';
-    }
-
-    function queueRenderPage(num) {
-      if (pageRendering) {
-        pageNumPending = num;
-      } else {
-        renderPage(num);
-      }
-    }
-
-    function goToNextPage() {
-      if (pageNum < pdfDoc.numPages) {
-        pageNum++;
-        queueRenderPage(pageNum);
-      }
-    }
-
-    function goToPrevPage() {
-      if (pageNum > 1) {
-        pageNum--;
-        queueRenderPage(pageNum);
-      }
-    }
-
-    function goToPortada() {
-      queueRenderPage(1);
-    }
-
-    function goToNotas() {
-      queueRenderPage(2);
-    }
-
-    function searchByNumber() {
-      const input = document.getElementById('search-num').value;
-      const number = parseInt(input, 10);
-      if (number >= 2001 && number <= 2700) {
-        const targetPage = number - 1998;
-        if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
-          queueRenderPage(targetPage);
-        } else {
-          alert('¡Número fuera de rango!');
-        }
-      } else {
-        alert('Número válido entre 2001 y 2700.');
-      }
-    }
-
-    async function searchText(query) {
-      for (let i = 1; i <= pdfDoc.numPages; i++) {
-        const page = await pdfDoc.getPage(i);
-        const textContent = await page.getTextContent();
-        const pageText = textContent.items.map(item => item.str.toLowerCase()).join(' ');
-        if (pageText.includes(query)) {
-          return i;
-        }
-      }
-      return -1;
-    }
-
-    async function searchTextRight() {
-      const query = document.getElementById('search-text-right').value.trim().toLowerCase();
-      if (!query) return alert('Palabra o frase a buscar');
-      const foundPage = await searchText(query);
-      foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
-    }
-
-    async function searchTextLeft() {
-      const query = document.getElementById('search-text-left').value.trim().toLowerCase();
-      if (!query) return alert('Palabra o frase a buscar');
-      const foundPage = await searchText(query);
-      foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
-    }
-
-    pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
-      pdfDoc = pdfDoc_;
-      renderPage(pageNum);
     });
-  </script>
+    pageNum=num;
+    document.getElementById('search-num').value='';
+    if(document.getElementById('search-text-right'))
+      document.getElementById('search-text-right').value='';
+  }
+  function queueRenderPage(num){pageRendering?pageNumPending=num:renderPage(num);}
+  function goToNextPage(){if(pageNum<pdfDoc.numPages){pageNum++;queueRenderPage(pageNum);}}
+  function goToPrevPage(){if(pageNum>1){pageNum--;queueRenderPage(pageNum);}}
+  function goToPortada(){queueRenderPage(1);}
+  function goToNotas(){queueRenderPage(2);}
+  function searchByNumber(){
+    const input=document.getElementById('search-num').value;
+    const number=parseInt(input,10);
+    if(number>=2001 && number<=2700){
+      const targetPage=number-1998;
+      if(targetPage>=1 && targetPage<=pdfDoc.numPages)queueRenderPage(targetPage);
+      else alert('¡Número fuera de rango!');
+    } else alert('Número válido entre 2001 y 2700.');
+  }
+  async function searchText(query){
+    for(let i=1;i<=pdfDoc.numPages;i++){
+      const page=await pdfDoc.getPage(i);
+      const textContent=await page.getTextContent();
+      const pageText=textContent.items.map(item=>item.str.toLowerCase()).join(' ');
+      if(pageText.includes(query))return i;
+    }
+    return -1;
+  }
+  async function searchTextRight(){
+    const query=document.getElementById('search-text-right').value.trim().toLowerCase();
+    if(!query)return alert('Palabra o frase a buscar');
+    const foundPage=await searchText(query);
+    foundPage>0?queueRenderPage(foundPage):alert('No se encontró la palabra o frase.');
+  }
+  async function searchTextLeft(){
+    const query=document.getElementById('search-text-left').value.trim().toLowerCase();
+    if(!query)return alert('Palabra o frase a buscar');
+    const foundPage=await searchText(query);
+    foundPage>0?queueRenderPage(foundPage):alert('No se encontró la palabra o frase.');
+  }
+  pdfjsLib.getDocument(url).promise.then(pdfDoc_=>{
+    pdfDoc=pdfDoc_;
+    renderPage(pageNum);
+  });
+  document.addEventListener('DOMContentLoaded',()=>{
+    const accordionBtn=document.getElementById('accordion-btn');
+    const accordionContent=document.getElementById('menu-content');
+    accordionBtn.addEventListener('click',()=>{
+      const expanded=accordionBtn.getAttribute('aria-expanded')==='true';
+      accordionBtn.setAttribute('aria-expanded', String(!expanded));
+      accordionBtn.classList.toggle('active');
+      accordionContent.classList.toggle('open');
+    });
+  });
+</script>
 </body>
 </html>
