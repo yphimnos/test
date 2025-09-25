@@ -3,94 +3,34 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Visor de PDF con Menú Acordeón</title>
+  <title>Visor PDF con menú simple móvil</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
       margin: 0;
       padding: 20px;
-      min-height: 100vh;
-      box-sizing: border-box;
       background-color: #f9f9f9;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
     }
 
     #container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
       width: 100%;
-      max-width: 1400px;
+      max-width: 1200px;
+      display: flex;
       gap: 20px;
     }
 
-    #menu, #right-navigation {
-      flex: 1 1 250px;
-      min-width: 200px;
-      max-width: 300px;
-      background-color: #f1f1f1;
-      padding: 10px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-    }
-
-    #menu h3, #menu h4,
-    #right-navigation h3, #right-navigation h4 {
-      font-size: 16px;
-      margin: 10px 0 5px 0;
-      cursor: pointer;
-      user-select: none;
-      text-align: center;
-    }
-
-    #menu button, #menu input[type=number],
-    #right-navigation button, #right-navigation input[type=text] {
-      font-size: 16px;
-      margin: 5px 0;
-      padding: 8px 10px;
-      width: 100%;
-      box-sizing: border-box;
-      border-radius: 4px;
-    }
-
-    #menu button,
-    #right-navigation button {
-      background-color: #008CBA;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-
-    #menu button:hover,
-    #right-navigation button:hover {
-      background-color: #007B9A;
-    }
-
-    #menu input[type=number],
-    #right-navigation input[type=text] {
-      background-color: white;
-      color: black;
-      border: 1px solid #ccc;
-    }
-
-    #menu input:focus,
-    #right-navigation input:focus {
-      outline: none;
-      box-shadow: 0 0 0 2px #008CBA;
-    }
-
     #pdf-container {
-      flex: 2 1 600px;
+      flex: 2 1 700px;
       min-width: 300px;
-      max-width: 100%;
       display: flex;
       justify-content: center;
-      align-items: center;
       position: relative;
+      flex-direction: column;
     }
 
     canvas {
@@ -99,19 +39,54 @@
       height: auto;
     }
 
-    /* NUEVO: Contenedor para botones flechas en móvil */
-    #mobile-nav-buttons {
-      display: none;
-      width: 100%;
-      max-width: 600px;
-      margin: 10px auto;
+    #menu-left, #menu-right {
+      flex: 1 1 280px;
+      background-color: #f1f1f1;
+      padding: 15px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
       display: flex;
-      justify-content: space-between;
-      gap: 10px;
+      flex-direction: column;
+    }
+
+    #menu-left h3, #menu-right h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    #menu-left button, #menu-right button,
+    #menu-left input, #menu-right input {
+      margin: 5px 0;
+      padding: 8px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
       box-sizing: border-box;
     }
 
-    #mobile-nav-buttons button {
+    #menu-left button, #menu-right button {
+      background-color: #008CBA;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    #menu-left button:hover, #menu-right button:hover {
+      background-color: #007B9A;
+    }
+
+    /* Botones de página (flechas) para móvil */
+    #mobile-page-buttons {
+      display: none;
+      margin-top: 10px;
+      width: 100%;
+      max-width: 700px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    #mobile-page-buttons button {
       flex: 1 1 45%;
       display: flex;
       align-items: center;
@@ -124,195 +99,161 @@
       padding: 10px 20px;
       font-size: 16px;
       cursor: pointer;
-      box-sizing: border-box;
     }
 
-    #mobile-nav-buttons button svg {
+    #mobile-page-buttons button svg {
       width: 16px;
       height: 16px;
       fill: white;
     }
 
-    #mobile-nav-buttons button.left svg {
+    #mobile-page-buttons button.left svg {
       transform: rotate(180deg);
     }
 
-    /* Mobile + Tablet Layout (hasta 1024px) */
+    /* Menú simple móvil debajo de flechas */
+    #mobile-simple-menu {
+      display: none;
+      margin-top: 15px;
+      max-width: 700px;
+      width: 100%;
+      background-color: #f1f1f1;
+      padding: 15px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    #mobile-simple-menu button,
+    #mobile-simple-menu input {
+      font-size: 16px;
+      padding: 8px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    #mobile-simple-menu button {
+      background-color: #008CBA;
+      color: white;
+      border: none;
+      cursor: pointer;
+      flex: 1 1 45%;
+      min-width: 140px;
+      max-width: 220px;
+    }
+
+    #mobile-simple-menu button:hover {
+      background-color: #007B9A;
+    }
+
+    #mobile-simple-menu input[type="number"],
+    #mobile-simple-menu input[type="text"] {
+      flex: 1 1 45%;
+      min-width: 140px;
+      max-width: 220px;
+      margin-bottom: 8px;
+      padding: 8px;
+    }
+
+    /* Media Queries */
+
+    /* Desktop - mostramos menús laterales, ocultamos móvil */
+    @media (min-width: 1025px) {
+      #container {
+        flex-wrap: nowrap;
+      }
+      #mobile-page-buttons,
+      #mobile-simple-menu {
+        display: none !important;
+      }
+      #menu-left {
+        display: flex;
+      }
+      #menu-right {
+        display: flex;
+      }
+      #pdf-container {
+        flex-direction: column;
+      }
+    }
+
+    /* Móvil y tablet - ocultamos menús laterales y mostramos flechas y menú simple */
     @media (max-width: 1024px) {
       #container {
         flex-direction: column;
         align-items: center;
       }
-
-      #menu, #pdf-container {
-        width: 100%;
-        max-width: none;
-      }
-
-      #menu {
-        order: 3;
-        padding-bottom: 10px;
-      }
-
-      #pdf-container {
-        order: 1;
-        margin-top: 10px;
-      }
-
-      #mobile-nav-buttons {
-        display: flex;
-        order: 2;
-      }
-
-      #right-navigation {
+      #menu-left, #menu-right {
         display: none;
       }
-
-      /* Menú acordeón estilos */
-      #menu h3.accordion {
-        background-color: #007B9A;
-        color: white;
-        padding: 10px;
-        border-radius: 5px;
-        margin: 10px 0 0 0;
+      #mobile-page-buttons {
+        display: flex;
       }
-
-      #menu .panel {
-        background-color: #f1f1f1;
-        overflow: hidden;
-        max-height: 0;
-        transition: max-height 0.3s ease-out;
-        padding-left: 5px;
-        padding-right: 5px;
-        border-radius: 0 0 5px 5px;
-      }
-
-      #menu .panel.open {
-        max-height: 500px; /* suficiente para el contenido */
-        padding-top: 10px;
-        padding-bottom: 10px;
-      }
-
-      /* Estilos para que el cajón inferior termine donde termina el contenido */
-      #menu .panel > div:last-child {
-        margin-bottom: 0;
-      }
-
-      /* Inputs de búsqueda iguales */
-      #search-text-left, #search-num {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 8px 10px;
-        font-size: 16px;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-        margin-bottom: 10px;
-      }
-
-      /* Botones de búsqueda */
-      #menu button.search-btn {
-        width: 100%;
-        box-sizing: border-box;
-        margin-bottom: 10px;
-      }
-    }
-
-    /* Desktop Layout (desde 1025px) */
-    @media (min-width: 1025px) {
-      #menu .accordion, #menu .panel {
-        all: unset;
-      }
-
-      #right-navigation {
-        display: block;
+      #mobile-simple-menu {
+        display: flex;
       }
     }
   </style>
 </head>
 <body>
   <div id="container">
-    <!-- PDF Container -->
+
     <div id="pdf-container">
       <canvas id="pdf-render"></canvas>
-    </div>
 
-    <!-- NUEVO: Botones de navegación entre PDF y menú en móvil -->
-    <div id="mobile-nav-buttons">
-      <button class="left" onclick="goToPrevPage()">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5l8 7-8 7V5z"/></svg>
-        Página Anterior
-      </button>
-      <button class="right" onclick="goToNextPage()">
-        Página Siguiente
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5l8 7-8 7V5z"/></svg>
-      </button>
-    </div>
+      <!-- Botones navegación páginas para móvil -->
+      <div id="mobile-page-buttons">
+        <button class="left" onclick="goToPrevPage()">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5l8 7-8 7V5z"/></svg>
+          Página Anterior
+        </button>
+        <button class="right" onclick="goToNextPage()">
+          Página Siguiente
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5l8 7-8 7V5z"/></svg>
+        </button>
+      </div>
 
-    <!-- Menú con acordeón para móvil -->
-    <div id="menu">
-      <!-- Navegar a -->
-      <h3 class="accordion">Navegar a</h3>
-      <div class="panel">
+      <!-- Menú simple móvil debajo flechas -->
+      <div id="mobile-simple-menu">
         <button onclick="goToPortada()">Portada</button>
         <button onclick="goToNotas()">Notas explicativas</button>
-      </div>
 
-      <!-- Búsqueda -->
-      <h3 class="accordion">Búsqueda</h3>
-      <div class="panel">
-        <label for="search-num">Buscar nro. de cántico:</label>
-        <input type="number" id="search-num" min="2001" max="2700" placeholder="Nro. de himno a buscar" />
-        <button class="search-btn" onclick="searchByNumber()">Buscar</button>
+        <input type="number" id="search-num-mobile" min="2001" max="2700" placeholder="Buscar nro. de cántico" />
+        <button onclick="searchByNumberMobile()">Buscar nro.</button>
 
-        <label for="search-text-left">Buscar frase:</label>
-        <input type="text" id="search-text-left" placeholder="Palabra o frase a buscar" />
-        <button class="search-btn" onclick="searchTextLeft()">Buscar</button>
+        <input type="text" id="search-text-mobile" placeholder="Buscar frase" />
+        <button onclick="searchTextMobile()">Buscar frase</button>
       </div>
     </div>
 
-    <!-- Menú derecho solo desktop -->
-    <div id="right-navigation">
+    <!-- Menús laterales desktop -->
+    <div id="menu-left">
       <h3>Navegar a:</h3>
       <button onclick="goToPortada()">Portada</button>
       <button onclick="goToNotas()">Notas explicativas</button>
-      <button class="arrow-btn left" onclick="goToPrevPage()">
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5l8 7-8 7V5z"/></svg>
-        Página Anterior
-      </button>
-      <button class="arrow-btn right" onclick="goToNextPage()">
-        Página Siguiente
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8 5l8 7-8 7V5z"/></svg>
-      </button>
-      <h4>Buscar frase:</h4>
+    </div>
+
+    <div id="menu-right">
+      <h3>Buscar frase:</h3>
       <input type="text" id="search-text-right" placeholder="Palabra o frase a buscar" />
       <button onclick="searchTextRight()">Buscar</button>
     </div>
+
   </div>
 
   <script>
-    // Acordeón mobile
-    document.querySelectorAll('#menu .accordion').forEach(header => {
-      header.addEventListener('click', () => {
-        const panel = header.nextElementSibling;
-        const isOpen = panel.classList.contains('open');
-
-        // Cerramos todos los paneles
-        document.querySelectorAll('#menu .panel').forEach(p => p.classList.remove('open'));
-
-        // Abrimos solo si no estaba abierto
-        if (!isOpen) {
-          panel.classList.add('open');
-        }
-      });
-    });
-
-    // PDF.js render
-    const url = 'meinedatei.pdf'; // Cambiar nombre archivo aquí
+    // PDF.js render config
+    const url = 'meinedatei.pdf'; // Cambia por tu archivo
 
     let pdfDoc = null,
-        pageNum = 1,
-        pageRendering = false,
-        pageNumPending = null;
+      pageNum = 1,
+      pageRendering = false,
+      pageNumPending = null;
 
     const canvas = document.getElementById('pdf-render');
     const ctx = canvas.getContext('2d');
@@ -341,12 +282,12 @@
 
       pageNum = num;
 
-      // Limpiar inputs
-      document.getElementById('search-num').value = '';
+      // Limpiamos inputs búsqueda móvil
+      document.getElementById('search-num-mobile').value = '';
+      document.getElementById('search-text-mobile').value = '';
+      // También limpieza del input desktop (por si acaso)
       const searchRight = document.getElementById('search-text-right');
       if (searchRight) searchRight.value = '';
-      const searchLeft = document.getElementById('search-text-left');
-      if (searchLeft) searchLeft.value = '';
     }
 
     function queueRenderPage(num) {
@@ -379,18 +320,40 @@
       queueRenderPage(2);
     }
 
-    function searchByNumber() {
-      const input = document.getElementById('search-num').value;
+    function searchByNumberMobile() {
+      const input = document.getElementById('search-num-mobile').value;
       const number = parseInt(input, 10);
       if (number >= 2001 && number <= 2700) {
         const targetPage = number - 1998;
         if (targetPage >= 1 && targetPage <= pdfDoc.numPages) {
           queueRenderPage(targetPage);
         } else {
-          alert('¡Número fuera de rango!');
+          alert('Número fuera de rango');
         }
       } else {
-        alert('Número válido entre 2001 y 2700.');
+        alert('Número válido entre 2001 y 2700');
+      }
+    }
+
+    async function searchTextMobile() {
+      const query = document.getElementById('search-text-mobile').value.trim().toLowerCase();
+      if (!query) return alert('Palabra o frase a buscar');
+      const foundPage = await searchText(query);
+      if (foundPage > 0) {
+        queueRenderPage(foundPage);
+      } else {
+        alert('No se encontró la palabra o frase.');
+      }
+    }
+
+    async function searchTextRight() {
+      const query = document.getElementById('search-text-right').value.trim().toLowerCase();
+      if (!query) return alert('Palabra o frase a buscar');
+      const foundPage = await searchText(query);
+      if (foundPage > 0) {
+        queueRenderPage(foundPage);
+      } else {
+        alert('No se encontró la palabra o frase.');
       }
     }
 
@@ -404,20 +367,6 @@
         }
       }
       return -1;
-    }
-
-    async function searchTextRight() {
-      const query = document.getElementById('search-text-right').value.trim().toLowerCase();
-      if (!query) return alert('Palabra o frase a buscar');
-      const foundPage = await searchText(query);
-      foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
-    }
-
-    async function searchTextLeft() {
-      const query = document.getElementById('search-text-left').value.trim().toLowerCase();
-      if (!query) return alert('Palabra o frase a buscar');
-      const foundPage = await searchText(query);
-      foundPage > 0 ? queueRenderPage(foundPage) : alert('No se encontró la palabra o frase.');
     }
 
     pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
