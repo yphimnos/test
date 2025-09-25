@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -35,10 +36,6 @@
       border: 1px solid #ccc;
       text-align: center;
       box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start; /* Die Boxen passen sich nur der Höhe des Inhalts an */
-      gap: 10px;
     }
 
     #menu h3, #menu h4,
@@ -187,31 +184,6 @@
       #menu .menu-search-text-mobile {
         display: none;
       }
-
-      #menu, #right-navigation {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        gap: 10px;
-      }
-
-      #menu .menu-special-buttons,
-      #right-navigation .menu-special-buttons {
-        margin-bottom: 15px;
-      }
-
-      #menu button, #right-navigation button {
-        margin-bottom: 8px;
-      }
-
-      #pdf-container {
-        flex: 2;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-        max-width: 100%;
-      }
     }
 
     /* Mobile-spezifische Suchbox */
@@ -227,12 +199,6 @@
 
     #menu .menu-search-text-mobile input[type=text]::placeholder {
       color: #aaa;
-      text-align: center; /* Placeholder zentriert */
-    }
-
-    /* NEU: Alle placeholder-Texte zentrieren */
-    input::placeholder {
-      text-align: center;
     }
   </style>
 </head>
