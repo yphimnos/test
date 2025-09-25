@@ -140,9 +140,11 @@
       }
 
       #pdf-container {
-        max-height: none;
+        height: 80vh !important;
+        width: 100% !important;
+        max-height: none !important;
+        overflow: visible !important;
         border-radius: 6px 6px 0 0;
-        height: 70vh; /* Altura visible para móvil */
       }
 
       #mobile-buttons {
@@ -205,13 +207,16 @@
 
       pdfDoc.getPage(num).then(function(page) {
         const container = document.getElementById('pdf-container');
-        const containerWidth = container.clientWidth;
+        const containerWidth = container.clientWidth * 0.95; // 95% para evitar scroll lateral
         const viewportUnscaled = page.getViewport({ scale: 1 });
         const scale = containerWidth / viewportUnscaled.width;
 
         const viewport = page.getViewport({ scale });
-        canvas.height = viewport.height;
+
+        canvas.style.width = containerWidth + 'px';
+        canvas.style.height = viewport.height + 'px';
         canvas.width = viewport.width;
+        canvas.height = viewport.height;
 
         // Limpiar canvas antes de renderizar
         ctx.clearRect(0, 0, canvas.width, canvas.height);
