@@ -37,10 +37,8 @@
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start; /* Boxen passen sich nur dem Inhalt an */
+      justify-content: flex-start; /* Die Boxen passen sich nur der Höhe des Inhalts an */
       gap: 10px;
-      flex-shrink: 0;
-      height: auto; /* Boxen passen sich der Höhe des Inhalts an */
     }
 
     #menu h3, #menu h4,
@@ -195,8 +193,6 @@
         flex-direction: column;
         justify-content: flex-start;
         gap: 10px;
-        flex-shrink: 0;
-        height: auto; /* Boxen passen sich der Höhe des Inhalts an */
       }
 
       #menu .menu-special-buttons,
@@ -205,7 +201,6 @@
       }
 
       #menu button, #right-navigation button {
-        flex-shrink: 0;
         margin-bottom: 8px;
       }
 
